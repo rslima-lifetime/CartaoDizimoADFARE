@@ -44,10 +44,25 @@ export default function Dashboard({
     })
     .slice(0, 5);
 
+  const formatCargoAbbrev = (cargo) => {
+    if (!cargo) return '';
+    const c = cargo.trim().toLowerCase();
+    if (c === 'membro' || c === 'nenhum' || c === '') return '';
+    if (c.startsWith('ev') || c === 'evangelista') return 'Ev.';
+    if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Pb.';
+    if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
+    if (c.startsWith('dcsa') || c.startsWith('diaconis')) return 'Dcsa.';
+    if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Dc.';
+    if (c.startsWith('miss') || c === 'missionário' || c === 'missionária') return 'Miss.';
+    if (c.startsWith('ob') || c === 'obreiro' || c === 'obreira') return 'Ob.';
+    return cargo;
+  };
+
   const getDizimistaName = (id) => {
     const d = dizimistas.find(x => x.id === id);
     if (!d) return 'Dizimista Removido';
-    return d.cargo ? `${d.cargo} ${d.nome}` : d.nome;
+    const abbrev = formatCargoAbbrev(d.cargo);
+    return abbrev ? `${abbrev} ${d.nome}` : d.nome;
   };
 
   const handleImportChange = (e) => {
