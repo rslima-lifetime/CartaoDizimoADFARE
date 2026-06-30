@@ -199,7 +199,9 @@ export default function CartaoDizimo({
 
     const rawPhone = dizimista.telefone || '';
     const phone = rawPhone.startsWith('55') ? rawPhone : (rawPhone ? '55' + rawPhone : '');
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    const whatsappUrl = phone 
+      ? `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`
+      : `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
 

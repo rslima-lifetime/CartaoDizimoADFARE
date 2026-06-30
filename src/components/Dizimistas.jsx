@@ -18,7 +18,6 @@ export default function Dizimistas({
   const [editingId, setEditingId] = useState(null);
   const [nome, setNome] = useState('');
   const [cargo, setCargo] = useState('');
-  const [telefone, setTelefone] = useState('');
   const [status, setStatus] = useState('Ativo');
 
   const cargos = ['Membro', 'Evangelista', 'Pastor', 'Presbítero', 'Diácono', 'Diaconisa', 'Missionário(a)', 'Obreiro(a)'];
@@ -81,18 +80,15 @@ export default function Dizimistas({
       setNome(dizimista.nome);
       setCargo(getFullCargoName(dizimista.cargo));
       
-      const rawTel = dizimista.telefone || '';
-      if (rawTel.startsWith('55')) {
-        setTelefone(rawTel.substring(2));
-      } else {
-        setTelefone(rawTel);
-      }
+    if (dizimista) {
+      setEditingId(dizimista.id);
+      setNome(dizimista.nome);
+      setCargo(getFullCargoName(dizimista.cargo));
       setStatus(dizimista.status);
     } else {
       setEditingId(null);
       setNome('');
       setCargo('Membro');
-      setTelefone('');
       setStatus('Ativo');
     }
     setIsFormOpen(true);
@@ -105,16 +101,10 @@ export default function Dizimistas({
       return;
     }
 
-    const cleanedLocal = telefone.replace(/\D/g, '');
-    let finalPhone = '';
-    if (cleanedLocal) {
-      finalPhone = cleanedLocal.startsWith('55') ? cleanedLocal : '55' + cleanedLocal;
-    }
-
     const data = {
       nome: nome.trim(),
       cargo,
-      telefone: finalPhone,
+      telefone: '',
       status
     };
 
@@ -136,8 +126,7 @@ export default function Dizimistas({
 
   // Filter list
   const filteredDizimistas = dizimistas.filter(d => {
-    const matchesSearch = d.nome.toLowerCase().includes(search.toLowerCase()) || 
-                          (d.telefone && d.telefone.includes(search));
+    const matchesSearch = d.nome.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'Todos' || d.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -166,7 +155,7 @@ export default function Dizimistas({
             <input 
               type="text" 
               className="search-input" 
-              placeholder="Buscar por nome ou telefone..."
+              placeholder="Buscar por nome..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -218,11 +207,6 @@ export default function Dizimistas({
                       <span className={`badge ${d.status === 'Ativo' ? 'badge-success' : 'badge-danger'}`}>
                         {d.status}
                       </span>
-                      {d.telefone && (
-                        <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                          📞 {formatPhoneFriendly(d.telefone)}
-                        </span>
-                      )}
                     </div>
                   </div>
                   <ArrowRight size={18} color="var(--text-muted)" />
@@ -263,18 +247,6 @@ export default function Dizimistas({
             </div>
             
             <div style={{ height: '1px', backgroundColor: 'var(--border)' }}></div>
-
-            {selectedDizimista.telefone && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Telefone</span>
-                <a 
-                  href={`tel:${selectedDizimista.telefone}`}
-                  style={{ textDecoration: 'none', color: 'var(--primary)', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}
-                >
-                  <Phone size={14} /> {formatPhoneFriendly(selectedDizimista.telefone)}
-                </a>
-              </div>
-            )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Status do Cadastro</span>
@@ -362,36 +334,6 @@ export default function Dizimistas({
                 </select>
               </div>
 
-              {/* Telefone */}
-              <div className="form-group">
-                <label className="form-label">Telefone (DDD + Celular)</label>
-                <div style={{ display: 'flex', alignItems: 'stretch' }}>
-                  <span style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 12px',
-                    backgroundColor: 'var(--bg-app)',
-                    border: '1px solid var(--border)',
-                    borderRight: 'none',
-                    borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)',
-                    fontSize: '14px',
-                    fontWeight: 'bold',
-                    color: 'var(--text-muted)'
-                  }}>
-                    +55
-                  </span>
-                  <input 
-                    type="tel" 
-                    className="form-control" 
-                    style={{
-                      borderRadius: '0 var(--radius-sm) var(--radius-sm) 0'
-                    }}
-                    placeholder="Ex: 11987654321"
-                    value={telefone}
-                    onChange={(e) => setTelefone(e.target.value)}
-                  />
-                </div>
-              </div>
 
               {/* Status */}
               <div className="form-group">
