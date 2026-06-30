@@ -757,10 +757,51 @@ select.form-control:focus {
   transition: var(--transition);
 }
 
-/* Center the 13th month tile */
+/* Center the 13th month tile - REMOVED / FLOWS NATURALLY */
 .mosaic-tile.tile-13 {
-  grid-column: 2 / 3;
-  margin-top: 4px;
+  /* flows naturally to fill row 5, col 1 */
+}
+
+/* Totalizer Tile Style */
+.mosaic-tile.tile-totalizer {
+  grid-column: span 2;
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.15);
+}
+
+.mosaic-tile.tile-totalizer:hover {
+  transform: none !important;
+  box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.15) !important;
+}
+
+.mosaic-tile.tile-totalizer .tile-month-name {
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.mosaic-tile.tile-totalizer .tile-value {
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.mosaic-tile.tile-totalizer .tile-footer {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 9px;
+  font-style: italic;
+  margin-top: 2px;
 }
 
 /* Paid Tile design */

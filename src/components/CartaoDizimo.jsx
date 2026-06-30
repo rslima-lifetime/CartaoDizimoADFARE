@@ -195,6 +195,9 @@ export default function CartaoDizimo({
       }
     });
 
+    const totalGeral = titherYearLancamentos.reduce((sum, l) => sum + l.valor, 0);
+    text += `\n*💰 TOTAL ENTREGUE NO ANO:* ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalGeral)}\n`;
+
     text += `\n_A Tesouraria, em nome do Ministério Família Restaurada, agradece a sua fidelidade e roga a Deus que supra todas as suas necessidades, em Glória, por Cristo Jesus! 🙌_`;
 
     const rawPhone = dizimista.telefone || '';
@@ -352,6 +355,17 @@ export default function CartaoDizimo({
                     </div>
                   );
                 })}
+
+                {/* Totalizer Tile */}
+                <div className="mosaic-tile tile-totalizer">
+                  <div className="tile-month-name">TOTAL ENTREGUE</div>
+                  <div className="tile-value">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+                      titherYearLancamentos.reduce((sum, l) => sum + l.valor, 0)
+                    )}
+                  </div>
+                  <div className="tile-footer">Acumulado no ano</div>
+                </div>
               </div>
 
               {/* Card Footer Quote */}
