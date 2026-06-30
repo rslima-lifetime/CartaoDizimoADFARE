@@ -116,10 +116,25 @@ export default function ModalLancamento({
   // Sum of contributions for this month
   const totalMonth = monthPayments.reduce((sum, p) => sum + p.valor, 0);
 
+  const formatCargoAbbrev = (cargo) => {
+    if (!cargo) return '';
+    const c = cargo.trim().toLowerCase();
+    if (c === 'membro' || c === 'nenhum' || c === '') return '';
+    if (c.startsWith('ev') || c === 'evangelista') return 'Ev.';
+    if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Pb.';
+    if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
+    if (c.startsWith('dcsa') || c.startsWith('diaconis')) return 'Dcsa.';
+    if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Dc.';
+    if (c.startsWith('miss') || c === 'missionário' || c === 'missionária') return 'Miss.';
+    if (c.startsWith('ob') || c === 'obreiro' || c === 'obreira') return 'Ob.';
+    return cargo;
+  };
+
   const getDizimistaName = () => {
     const d = dizimistas.find(x => x.id === dizimistaId);
     if (!d) return '';
-    return d.cargo ? `${d.cargo} ${d.nome}` : d.nome;
+    const abbrev = formatCargoAbbrev(d.cargo);
+    return abbrev ? `${abbrev} ${d.nome}` : d.nome;
   };
 
   // Date formatting for list
@@ -217,11 +232,14 @@ export default function ModalLancamento({
               required
             >
               <option value="">Selecione um dizimista...</option>
-              {dizimistas.map(d => (
-                <option key={d.id} value={d.id}>
-                  {d.cargo ? `${d.cargo} ` : ''}{d.nome}
-                </option>
-              ))}
+              {dizimistas.map(d => {
+                const abbrev = formatCargoAbbrev(d.cargo);
+                return (
+                  <option key={d.id} value={d.id}>
+                    {abbrev ? `${abbrev} ` : ''}{d.nome}
+                  </option>
+                );
+              })}
             </select>
           </div>
         )}
