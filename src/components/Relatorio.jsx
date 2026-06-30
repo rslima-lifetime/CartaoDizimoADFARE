@@ -13,8 +13,8 @@ const formatCargoAbbrev = (cargo) => {
   const c = cargo.trim().toLowerCase();
   if (c === 'membro' || c === 'nenhum' || c === '') return '';
   if (c.startsWith('ev') || c === 'evangelista') return 'Ev.';
-  if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
   if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Pb.';
+  if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
   if (c.startsWith('dcsa') || c.startsWith('diaconis') || c === 'diaconisa') return 'Dcsa.';
   if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Dc.';
   if (c.startsWith('miss') || c === 'missionário(a)') return 'Miss.';

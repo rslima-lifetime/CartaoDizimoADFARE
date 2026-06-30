@@ -28,8 +28,8 @@ export default function Dizimistas({
     const c = cargo.trim().toLowerCase();
     if (c === 'membro' || c === 'nenhum' || c === '') return 'Membro';
     if (c.startsWith('ev') || c === 'evangelista') return 'Evangelista';
-    if (c.startsWith('pr') || c === 'pastor') return 'Pastor';
     if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Presbítero';
+    if (c.startsWith('pr') || c === 'pastor') return 'Pastor';
     if (c.startsWith('dcsa') || c.startsWith('diaconis')) return 'Diaconisa';
     if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Diácono';
     if (c.startsWith('miss') || c === 'missionário' || c === 'missionária') return 'Missionário(a)';
@@ -42,8 +42,8 @@ export default function Dizimistas({
     const c = cargo.trim().toLowerCase();
     if (c === 'membro' || c === 'nenhum' || c === '') return '';
     if (c.startsWith('ev') || c === 'evangelista') return 'Ev.';
-    if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
     if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Pb.';
+    if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
     if (c.startsWith('dcsa') || c.startsWith('diaconis')) return 'Dcsa.';
     if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Dc.';
     if (c.startsWith('miss') || c === 'missionário' || c === 'missionária') return 'Miss.';
