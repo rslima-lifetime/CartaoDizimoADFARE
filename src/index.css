@@ -1188,8 +1188,8 @@ select.form-control:focus {
 
 .evolucao-head {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 0.7fr 1.5fr;
-  gap: 0;
+  grid-template-columns: 1.1fr 1.3fr 0.8fr 1.3fr;
+  gap: 8px;
   padding: 8px 12px;
   background: var(--primary);
   color: white;
@@ -1199,10 +1199,18 @@ select.form-control:focus {
   letter-spacing: 0.4px;
 }
 
+.evolucao-head span:nth-child(2) {
+  text-align: right;
+}
+
+.evolucao-head span:nth-child(3) {
+  text-align: center;
+}
+
 .evolucao-row {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 0.7fr 1.5fr;
-  gap: 0;
+  grid-template-columns: 1.1fr 1.3fr 0.8fr 1.3fr;
+  gap: 8px;
   padding: 9px 12px;
   border-bottom: 1px solid var(--border);
   align-items: center;
@@ -1230,17 +1238,22 @@ select.form-control:focus {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ev-val {
   font-size: 13px;
   font-weight: 700;
   color: var(--primary);
+  text-align: right;
 }
 
 .ev-qtd {
   font-size: 12px;
   color: var(--text-muted);
+  text-align: center;
 }
 
 .ev-bar-wrap {
@@ -1519,5 +1532,28 @@ select.form-control:focus {
 .relatorio-page .rel-stat-card,
 .relatorio-page .ranking-item {
   --bg-main: var(--bg-input);
+}
+
+@media (max-width: 420px) {
+  .evolucao-head {
+    font-size: 10px;
+    padding: 8px 6px;
+    gap: 4px;
+    grid-template-columns: 1fr 1.2fr 0.8fr 1.1fr;
+  }
+  
+  .evolucao-row {
+    padding: 8px 6px;
+    gap: 4px;
+    grid-template-columns: 1fr 1.2fr 0.8fr 1.1fr;
+  }
+  
+  .ev-mes, .ev-val {
+    font-size: 11px;
+  }
+  
+  .ev-qtd {
+    font-size: 11px;
+  }
 }
 

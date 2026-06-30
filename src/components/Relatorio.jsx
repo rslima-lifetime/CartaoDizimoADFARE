@@ -2,8 +2,8 @@ import React, { useState, useMemo, useRef } from 'react';
 import { FileText, MessageCircle, Download, Trophy, TrendingUp, Users, DollarSign, Calendar, Award, Star } from 'lucide-react';
 import LogoADFARE from './LogoADFARE';
 
-const MESES = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
-const MESES_FULL = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MESES = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+const MESES_FULL = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
@@ -206,14 +206,14 @@ export default function Relatorio({ dizimistas, lancamentos }) {
             {tipoPeriodo === 'mes' && (
               <div className="filtro-group">
                 <label>Mês</label>
-                <select className="form-control" value={selectedMesIdx} onChange={e => { setSelectedMesIdx(Number(e.target.value)); setGerado(false); }}>
+                <select value={selectedMesIdx} onChange={e => { setSelectedMesIdx(Number(e.target.value)); setGerado(false); }}>
                   {MESES_FULL.map((m, i) => <option key={i} value={i}>{m}</option>)}
                 </select>
               </div>
             )}
             <div className="filtro-group">
               <label>Ano</label>
-              <select className="form-control" value={selectedAno} onChange={e => { setSelectedAno(Number(e.target.value)); setGerado(false); }}>
+              <select value={selectedAno} onChange={e => { setSelectedAno(Number(e.target.value)); setGerado(false); }}>
                 {anosDisponiveis.map(a => <option key={a} value={a}>{a}</option>)}
               </select>
             </div>
@@ -374,8 +374,8 @@ export default function Relatorio({ dizimistas, lancamentos }) {
                             width: `${d.pct}%`,
                             background: d.pct === 100 ? 'linear-gradient(90deg, #f59e0b, #d97706)' :
                               d.pct >= 70 ? 'linear-gradient(90deg, #94a3b8, #64748b)' :
-                              d.pct >= 40 ? 'linear-gradient(90deg, #fbbf24, #a16207)' :
-                              d.pct > 0 ? 'linear-gradient(90deg, #fb923c, #f97316)' : '#e2e8f0'
+                                d.pct >= 40 ? 'linear-gradient(90deg, #fbbf24, #a16207)' :
+                                  d.pct > 0 ? 'linear-gradient(90deg, #fb923c, #f97316)' : '#e2e8f0'
                           }}
                         />
                       </div>
