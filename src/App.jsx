@@ -16,7 +16,12 @@ const INITIAL_DIZIMISTAS = [
   { id: '6', nome: 'Carlos Leandro', cargo: 'Membro', telefone: '', status: 'Ativo' },
   { id: '7', nome: 'Leandro Santos', cargo: 'Presb.', telefone: '', status: 'Ativo' },
   { id: '8', nome: 'Ruan dos Santos', cargo: 'Dc.', telefone: '', status: 'Ativo' },
-  { id: '9', nome: 'Sthefani Figueiredo', cargo: 'Membro', telefone: '', status: 'Ativo' }
+  { id: '9', nome: 'Sthefani Figueiredo', cargo: 'Membro', telefone: '', status: 'Ativo' },
+  { id: '10', nome: 'Ana Paula Araújo', cargo: 'Obr.', telefone: '', status: 'Ativo' },
+  { id: '11', nome: 'Flávia Lima', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
+  { id: '12', nome: 'Taiane Santos', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
+  { id: '13', nome: 'Laís Azeredo', cargo: 'Obr.', telefone: '', status: 'Ativo' },
+  { id: '14', nome: 'Tatiane Simas', cargo: 'Dcsa.', telefone: '', status: 'Ativo' }
 ];
 
 const INITIAL_LANCAMENTOS = [
@@ -72,7 +77,45 @@ const INITIAL_LANCAMENTOS = [
   { id: 'l32', dizimistaId: '9', ano: 2026, mes: 'MAR', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-10' },
   { id: 'l33', dizimistaId: '9', ano: 2026, mes: 'ABR', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-04' },
   { id: 'l34', dizimistaId: '9', ano: 2026, mes: 'MAI', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-08' },
-  { id: 'l35', dizimistaId: '9', ano: 2026, mes: 'JUN', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-06' }
+  { id: 'l35', dizimistaId: '9', ano: 2026, mes: 'JUN', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-06' },
+
+  // Obr. Ana Paula Araújo
+  { id: 'l36', dizimistaId: '10', ano: 2026, mes: 'JAN', valor: 300.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-06' },
+  { id: 'l37', dizimistaId: '10', ano: 2026, mes: 'FEV', valor: 242.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-04' },
+  { id: 'l38', dizimistaId: '10', ano: 2026, mes: 'MAR', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-09' },
+  { id: 'l39', dizimistaId: '10', ano: 2026, mes: 'ABR', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-08' },
+  { id: 'l40', dizimistaId: '10', ano: 2026, mes: 'MAI', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-06' },
+  { id: 'l41', dizimistaId: '10', ano: 2026, mes: 'JUN', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-03' },
+
+  // Dcsa. Flávia Lima
+  { id: 'l42', dizimistaId: '11', ano: 2026, mes: 'JAN', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-07' },
+  { id: 'l43', dizimistaId: '11', ano: 2026, mes: 'FEV', valor: 140.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-07' },
+
+  // Dcsa. Taiane Santos
+  { id: 'l44', dizimistaId: '12', ano: 2026, mes: 'JAN', valor: 120.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-08' },
+  { id: 'l45', dizimistaId: '12', ano: 2026, mes: 'FEV', valor: 140.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-07' },
+  { id: 'l46', dizimistaId: '12', ano: 2026, mes: 'MAR', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-06' },
+  { id: 'l47', dizimistaId: '12', ano: 2026, mes: 'ABR', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-07' },
+  { id: 'l48', dizimistaId: '12', ano: 2026, mes: 'MAI', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-07' },
+  { id: 'l49', dizimistaId: '12', ano: 2026, mes: 'JUN', valor: 120.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-06' },
+
+  // Obr. Laís Azeredo
+  { id: 'l50', dizimistaId: '13', ano: 2026, mes: 'JAN', valor: 105.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-15' },
+  { id: 'l51', dizimistaId: '13', ano: 2026, mes: 'JAN', valor: 105.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-30' },
+  { id: 'l52', dizimistaId: '13', ano: 2026, mes: 'FEV', valor: 170.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-10' },
+  { id: 'l53', dizimistaId: '13', ano: 2026, mes: 'MAR', valor: 170.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-06' },
+  { id: 'l54', dizimistaId: '13', ano: 2026, mes: 'ABR', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-07' },
+  { id: 'l55', dizimistaId: '13', ano: 2026, mes: 'ABR', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-17' },
+  { id: 'l56', dizimistaId: '13', ano: 2026, mes: 'MAI', valor: 170.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-08' },
+  { id: 'l57', dizimistaId: '13', ano: 2026, mes: 'JUN', valor: 170.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-08' },
+
+  // Dcsa. Tatiane Simas
+  { id: 'l58', dizimistaId: '14', ano: 2026, mes: 'JAN', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-20' },
+  { id: 'l59', dizimistaId: '14', ano: 2026, mes: 'FEV', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-13' },
+  { id: 'l60', dizimistaId: '14', ano: 2026, mes: 'MAR', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-19' },
+  { id: 'l61', dizimistaId: '14', ano: 2026, mes: 'ABR', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-18' },
+  { id: 'l62', dizimistaId: '14', ano: 2026, mes: 'MAI', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-20' },
+  { id: 'l63', dizimistaId: '14', ano: 2026, mes: 'JUN', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-18' }
 ];
 
 export default function App() {
@@ -92,15 +135,15 @@ export default function App() {
 
   // Load data from localStorage on mount
   useEffect(() => {
-    const isV5Loaded = localStorage.getItem('adfare_loaded_v5');
+    const isV6Loaded = localStorage.getItem('adfare_loaded_v6');
     
-    if (!isV5Loaded) {
-      // Force initial load of the official church records from user's screenshots (with multi-payment support - v5 database)
+    if (!isV6Loaded) {
+      // Force initial load of the official church records from user's screenshots (with multi-payment support - v6 database)
       setDizimistas(INITIAL_DIZIMISTAS);
       setLancamentos(INITIAL_LANCAMENTOS);
       localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
       localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
-      localStorage.setItem('adfare_loaded_v5', 'true');
+      localStorage.setItem('adfare_loaded_v6', 'true');
     } else {
       const savedDizimistas = localStorage.getItem('adfare_dizimistas');
       const savedLancamentos = localStorage.getItem('adfare_lancamentos');
