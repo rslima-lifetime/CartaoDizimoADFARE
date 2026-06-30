@@ -25,14 +25,23 @@ export default function Lancamentos({
     return d.cargo ? `${d.cargo} ${d.nome}` : d.nome;
   };
 
+  const formatDateFriendly = (dateStr) => {
+    if (!dateStr) return '';
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [y, m, d] = dateStr.split('-');
+      return `${d}/${m}/${y}`;
+    }
+    return dateStr;
+  };
+
   const handleEdit = (tx) => {
     onEditLancamento(tx);
   };
 
   const handleDelete = (tx) => {
     const name = getDizimistaName(tx.dizimistaId);
-    if (confirm(`Excluir o lançamento de ${tx.mes}/${tx.ano} no valor de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)} para "${name}"?`)) {
-      onDeleteLancamento(tx.dizimistaId, tx.ano, tx.mes);
+    if (confirm(`Excluir a entrega no valor de ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)} para "${name}"?`)) {
+      onDeleteLancamento(tx.id);
     }
   };
 
@@ -158,7 +167,7 @@ export default function Lancamentos({
                   </span>
                 </div>
                 <div className="history-item-sub" style={{ fontSize: '12px', marginTop: '2px' }}>
-                  Competência: <strong>{tx.mes}/{tx.ano}</strong> • Tesoureiro: {tx.tesoureiro}
+                  Competência: <strong>{tx.mes}/{tx.ano}</strong> • Data: {formatDateFriendly(tx.dataEntrega || tx.dataLançamento)} • Tesoureiro: {tx.tesoureiro}
                 </div>
               </div>
               

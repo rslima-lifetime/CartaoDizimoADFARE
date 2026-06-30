@@ -43,9 +43,20 @@ export default function CartaoDizimo({
     l => l.dizimistaId === selectedDizimistaId && l.ano === parseInt(selectedYear)
   );
 
-  // Map months to contributions
+  // Map months to aggregated contributions (Sum of all payments for the month)
   const getContributionForMonth = (mesKey) => {
-    return titherYearLancamentos.find(l => l.mes === mesKey);
+    const monthPayments = titherYearLancamentos.filter(l => l.mes === mesKey);
+    if (monthPayments.length === 0) return null;
+    
+    // Sum values
+    const totalValue = monthPayments.reduce((sum, p) => sum + p.valor, 0);
+    // Use last treasurer in the month list
+    const lastTreasurer = monthPayments[monthPayments.length - 1].tesoureiro;
+    
+    return {
+      valor: totalValue,
+      tesoureiro: lastTreasurer
+    };
   };
 
   // Helper to format date as DD/MM
@@ -159,9 +170,9 @@ export default function CartaoDizimo({
       const tx = getContributionForMonth(m.key);
       if (tx) {
         const val = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor);
-        text += `• *${m.key}:* ${val} (${formatDateAbbrev(tx.dataLançamento)}) - Por: ${tx.tesoureiro}\n`;
+        text += `• *${m.name}:* ${val} - Por: ${tx.tesoureiro}\n`;
       } else {
-        text += `• *${m.key}:* [Em aberto]\n`;
+        text += `• *${m.name}:* [Em aberto]\n`;
       }
     });
 
@@ -283,13 +294,11 @@ export default function CartaoDizimo({
                 </div>
               </div>
 
-              {/* Conditional Layouts */}
               {layoutMode === 'table' ? (
                 /* Layout 1: Modernized Table */
                 <table className="modern-table">
                   <thead>
                     <tr>
-                      <th>DATA</th>
                       <th>MÊS</th>
                       <th>DÍZIMO</th>
                       <th>TESOUREIRO</th>
@@ -304,7 +313,6 @@ export default function CartaoDizimo({
                             key={m.key} 
                             onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
                           >
-                            <td className="col-date">{formatDateAbbrev(tx.dataLançamento)}</td>
                             <td className="col-month">{m.key}</td>
                             <td className="col-value">
                               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)}
@@ -319,7 +327,6 @@ export default function CartaoDizimo({
                             className="empty-row"
                             onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
                           >
-                            <td className="col-date"></td>
                             <td className="col-month">{m.key}</td>
                             <td className="col-value"></td>
                             <td className="col-treasurer"></td>
@@ -351,8 +358,8 @@ export default function CartaoDizimo({
                             <div className="tile-value">
                               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(tx.valor)}
                             </div>
-                            <div className="tile-footer">
-                              {formatDateAbbrev(tx.dataLançamento)} • {tx.tesoureiro.split(' ').slice(-1)[0]}
+                            <div className="tile-footer" style={{ marginTop: '2px' }}>
+                              Por: {tx.tesoureiro.split(' ').slice(-1)[0]}
                             </div>
                           </>
                         ) : (

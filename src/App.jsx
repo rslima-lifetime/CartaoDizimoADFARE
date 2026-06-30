@@ -17,28 +17,34 @@ const INITIAL_DIZIMISTAS = [
 
 const INITIAL_LANCAMENTOS = [
   // Ev. Carlos Santos
-  { dizimistaId: '1', ano: 2026, mes: 'JAN', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '2026-01-04T10:00:00.000Z' },
+  { id: 'l1', dizimistaId: '1', ano: 2026, mes: 'JAN', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-04' },
   
   // Presb. Carlos Noan
-  { dizimistaId: '2', ano: 2026, mes: 'JAN', valor: 270.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '09/01' },
-  { dizimistaId: '2', ano: 2026, mes: 'FEV', valor: 290.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '06/02 - 19/02' },
-  { dizimistaId: '2', ano: 2026, mes: 'MAR', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '06/03 - 29/03' },
-  { dizimistaId: '2', ano: 2026, mes: 'ABR', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '07/04 - 15/04' },
-  { dizimistaId: '2', ano: 2026, mes: 'MAI', valor: 576.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '01/05 - 05/05 - 18/05' },
-  { dizimistaId: '2', ano: 2026, mes: 'JUN', valor: 310.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '05/06 - 17/06' },
+  { id: 'l2', dizimistaId: '2', ano: 2026, mes: 'JAN', valor: 270.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-09' },
+  { id: 'l3', dizimistaId: '2', ano: 2026, mes: 'FEV', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-06' },
+  { id: 'l4', dizimistaId: '2', ano: 2026, mes: 'FEV', valor: 140.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-19' },
+  { id: 'l5', dizimistaId: '2', ano: 2026, mes: 'MAR', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-06' },
+  { id: 'l6', dizimistaId: '2', ano: 2026, mes: 'MAR', valor: 120.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-29' },
+  { id: 'l7', dizimistaId: '2', ano: 2026, mes: 'ABR', valor: 125.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-07' },
+  { id: 'l8', dizimistaId: '2', ano: 2026, mes: 'ABR', valor: 125.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-15' },
+  { id: 'l9', dizimistaId: '2', ano: 2026, mes: 'MAI', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-01' },
+  { id: 'l10', dizimistaId: '2', ano: 2026, mes: 'MAI', valor: 176.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-05' },
+  { id: 'l11', dizimistaId: '2', ano: 2026, mes: 'MAI', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-18' },
+  { id: 'l12', dizimistaId: '2', ano: 2026, mes: 'JUN', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-05' },
+  { id: 'l13', dizimistaId: '2', ano: 2026, mes: 'JUN', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-17' },
 
   // Dc. Ednaldo Almeida
-  { dizimistaId: '3', ano: 2026, mes: 'JAN', valor: 148.41, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '08/01' },
-  { dizimistaId: '3', ano: 2026, mes: 'FEV', valor: 142.10, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '06/02' },
-  { dizimistaId: '3', ano: 2026, mes: 'ABR', valor: 116.78, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '07/04' },
-  { dizimistaId: '3', ano: 2026, mes: 'MAI', valor: 330.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '10/05' },
-  { dizimistaId: '3', ano: 2026, mes: 'JUN', valor: 268.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '08/06' },
+  { id: 'l14', dizimistaId: '3', ano: 2026, mes: 'JAN', valor: 148.41, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-08' },
+  { id: 'l15', dizimistaId: '3', ano: 2026, mes: 'FEV', valor: 142.10, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-06' },
+  { id: 'l16', dizimistaId: '3', ano: 2026, mes: 'ABR', valor: 116.78, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-07' },
+  { id: 'l17', dizimistaId: '3', ano: 2026, mes: 'MAI', valor: 330.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-10' },
+  { id: 'l18', dizimistaId: '3', ano: 2026, mes: 'JUN', valor: 268.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-08' },
 
   // Dc. Roberto Lima
-  { dizimistaId: '4', ano: 2026, mes: 'JAN', valor: 60.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '09/01' },
+  { id: 'l19', dizimistaId: '4', ano: 2026, mes: 'JAN', valor: 60.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-09' },
 
   // Dc. Roberto da Silva
-  { dizimistaId: '5', ano: 2026, mes: 'JAN', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '04/01' }
+  { id: 'l20', dizimistaId: '5', ano: 2026, mes: 'JAN', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-04' }
 ];
 
 export default function App() {
@@ -58,15 +64,15 @@ export default function App() {
 
   // Load data from localStorage on mount
   useEffect(() => {
-    const isV3Loaded = localStorage.getItem('adfare_loaded_v3');
+    const isV4Loaded = localStorage.getItem('adfare_loaded_v4');
     
-    if (!isV3Loaded) {
-      // Force initial load of the official church records from user's screenshots
+    if (!isV4Loaded) {
+      // Force initial load of the official church records from user's screenshots (with multi-payment support)
       setDizimistas(INITIAL_DIZIMISTAS);
       setLancamentos(INITIAL_LANCAMENTOS);
       localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
       localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
-      localStorage.setItem('adfare_loaded_v3', 'true');
+      localStorage.setItem('adfare_loaded_v4', 'true');
     } else {
       const savedDizimistas = localStorage.getItem('adfare_dizimistas');
       const savedLancamentos = localStorage.getItem('adfare_lancamentos');
@@ -139,25 +145,22 @@ export default function App() {
 
   // Lancamentos CRUD
   const handleSaveLancamento = (data) => {
-    // Check if entry already exists (same dizimista, same year, same month)
-    const existsIndex = lancamentos.findIndex(
-      l => l.dizimistaId === data.dizimistaId && l.ano === data.ano && l.mes === data.mes
-    );
-
-    let updated;
-    if (existsIndex >= 0) {
-      updated = [...lancamentos];
-      updated[existsIndex] = { ...updated[existsIndex], ...data };
+    if (data.id) {
+      // Update existing item
+      const updated = lancamentos.map(l => l.id === data.id ? { ...l, ...data } : l);
+      saveLancamentos(updated);
     } else {
-      updated = [...lancamentos, data];
+      // Add new item
+      const newEntry = {
+        ...data,
+        id: Date.now().toString()
+      };
+      saveLancamentos([...lancamentos, newEntry]);
     }
-    saveLancamentos(updated);
   };
 
-  const handleDeleteLancamento = (dizimistaId, ano, mes) => {
-    const updated = lancamentos.filter(
-      l => !(l.dizimistaId === dizimistaId && l.ano === ano && l.mes === mes)
-    );
+  const handleDeleteLancamentoById = (id) => {
+    const updated = lancamentos.filter(l => l.id !== id);
     saveLancamentos(updated);
   };
 
@@ -269,7 +272,7 @@ export default function App() {
             lancamentos={lancamentos}
             dizimistas={dizimistas}
             onOpenModal={handleOpenNewLancamento}
-            onDeleteLancamento={handleDeleteLancamento}
+            onDeleteLancamento={handleDeleteLancamentoById}
             onEditLancamento={handleEditLancamento}
           />
         )}
@@ -290,6 +293,7 @@ export default function App() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveLancamento}
+        onDelete={handleDeleteLancamentoById}
         dizimistas={dizimistas}
         lancamentos={lancamentos}
         initialData={modalInitialData}

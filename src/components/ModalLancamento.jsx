@@ -1,97 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Trash2, Calendar, DollarSign, UserCheck, Plus } from 'lucide-react';
 
 export default function ModalLancamento({ 
   isOpen, 
   onClose, 
   onSave, 
+  onDelete,
   dizimistas, 
-  initialData = null, // e.g. { dizimistaId: '', ano: 2026, mes: 'JAN' }
+  initialData = null, // { dizimistaId, ano, mes }
   lancamentos = []
 }) {
   const [dizimistaId, setDizimistaId] = useState('');
   const [ano, setAno] = useState(new Date().getFullYear());
   const [mes, setMes] = useState('JAN');
+
+  // Input fields for adding a new payment
+  const [dataEntrega, setDataEntrega] = useState('');
   const [valorText, setValorText] = useState('');
   const [tesoureiro, setTesoureiro] = useState('');
 
   const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ', '13º'];
 
-  // Load defaults when modal opens or initialData changes
-  useEffect(() => {
-    if (isOpen) {
-      // 1. Detect if editing or creating with prefilled data
-      if (initialData) {
-        setDizimistaId(initialData.dizimistaId || '');
-        setAno(initialData.ano || new Date().getFullYear());
-        setMes(initialData.mes || 'JAN');
-        
-        // Find if contribution already exists for this tither/year/month
-        const existing = lancamentos.find(
-          l => l.dizimistaId === initialData.dizimistaId && 
-               l.ano === parseInt(initialData.ano) && 
-               l.mes === initialData.mes
-        );
-
-        if (existing) {
-          setValorText(formatCurrency(existing.valor));
-          setTesoureiro(existing.tesoureiro || '');
-        } else {
-          // If creating, check tither's last contribution amount
-          const titherLast = lancamentos
-            .filter(l => l.dizimistaId === initialData.dizimistaId)
-            .sort((a, b) => new Date(b.dataLançamento) - new Date(a.dataLançamento))[0];
-          
-          setValorText(titherLast ? formatCurrency(titherLast.valor) : '');
-          
-          // Auto fill last treasurer used in any transaction
-          const lastTx = [...lancamentos].sort((a, b) => new Date(b.dataLançamento) - new Date(a.dataLançamento))[0];
-          setTesoureiro(lastTx ? lastTx.tesoureiro : '');
-        }
-      } else {
-        // Simple blank creation
-        setDizimistaId('');
-        setAno(new Date().getFullYear());
-        setMes(meses[new Date().getMonth()]); // default current month
-        setValorText('');
-        
-        // Auto fill last treasurer
-        const lastTx = [...lancamentos].sort((a, b) => new Date(b.dataLançamento) - new Date(a.dataLançamento))[0];
-        setTesoureiro(lastTx ? lastTx.tesoureiro : '');
-      }
-    }
-  }, [isOpen, initialData, lancamentos]);
-
-  // Handle tither change to auto-suggest last contribution value
-  const handleDizimistaChange = (id) => {
-    setDizimistaId(id);
-    if (id && !initialData?.valor) {
-      const titherLast = lancamentos
-        .filter(l => l.dizimistaId === id)
-        .sort((a, b) => new Date(b.dataLançamento) - new Date(a.dataLançamento))[0];
-      if (titherLast) {
-        setValorText(formatCurrency(titherLast.valor));
-      }
-    }
+  // Helper: local YYYY-MM-DD
+  const getLocalDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Convert number to R$ string format
   const formatCurrency = (value) => {
     if (value === undefined || value === null) return '';
-    const cleanValue = value.toFixed(2).replace('.', ',');
-    return `R$ ${cleanValue}`;
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   };
 
   // Handle currency input formatting
   const handleCurrencyInput = (e) => {
     let value = e.target.value;
-    // Remove everything except numbers
     value = value.replace(/\D/g, '');
     if (!value) {
       setValorText('');
       return;
     }
-    // Parse to float and divide by 100 for cents
     const floatValue = parseFloat(value) / 100;
     setValorText(
       new Intl.NumberFormat('pt-BR', {
@@ -101,14 +56,69 @@ export default function ModalLancamento({
     );
   };
 
-  const handleSubmit = (e) => {
+  // Set default values when modal opens or initialData changes
+  useEffect(() => {
+    if (isOpen) {
+      // 1. Preload tither and competence
+      if (initialData) {
+        setDizimistaId(initialData.dizimistaId || '');
+        setAno(initialData.ano || new Date().getFullYear());
+        setMes(initialData.mes || 'JAN');
+      } else {
+        setDizimistaId('');
+        setAno(new Date().getFullYear());
+        setMes(meses[new Date().getMonth()]);
+      }
+
+      // 2. Clear inputs for new entry
+      setDataEntrega(getLocalDateString());
+      setValorText('');
+
+      // Auto-fill treasurer with last used in the ledger
+      const lastTx = [...lancamentos].sort((a, b) => b.id - a.id)[0];
+      setTesoureiro(lastTx ? lastTx.tesoureiro : '');
+    }
+  }, [isOpen, initialData, lancamentos]);
+
+  // Find tither's contributions for this specific month/year
+  const monthPayments = lancamentos.filter(
+    l => l.dizimistaId === dizimistaId && l.ano === parseInt(ano) && l.mes === mes
+  );
+
+  // Sum of contributions for this month
+  const totalMonth = monthPayments.reduce((sum, p) => sum + p.valor, 0);
+
+  const getDizimistaName = () => {
+    const d = dizimistas.find(x => x.id === dizimistaId);
+    if (!d) return '';
+    return d.cargo ? `${d.cargo} ${d.nome}` : d.nome;
+  };
+
+  // Date formatting for list
+  const formatDateFriendly = (dateStr) => {
+    if (!dateStr) return '';
+    // If it is standard YYYY-MM-DD
+    if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      const [y, m, d] = dateStr.split('-');
+      return `${d}/${m}/${y}`;
+    }
+    // Return original string if it is in old layout format like "04/01"
+    return dateStr;
+  };
+
+  // Add delivery submit handler
+  const handleAddPayment = (e) => {
     e.preventDefault();
-    if (!dizimistaId || !ano || !mes || !valorText || !tesoureiro.trim()) {
-      alert('Por favor, preencha todos os campos.');
+    if (!dizimistaId) {
+      alert('Por favor, selecione um dizimista.');
+      return;
+    }
+    if (!dataEntrega || !valorText || !tesoureiro.trim()) {
+      alert('Por favor, preencha todos os campos da nova entrega.');
       return;
     }
 
-    // Convert formatted money (e.g. "R$ 120,50") back to float number
+    // Convert formatted currency to float
     const numericValue = parseFloat(
       valorText
         .replace('R$', '')
@@ -118,46 +128,55 @@ export default function ModalLancamento({
     );
 
     if (isNaN(numericValue) || numericValue <= 0) {
-      alert('Por favor, insira um valor válido de dízimo.');
+      alert('Valor inválido.');
       return;
     }
 
-    const data = {
+    const payload = {
       dizimistaId,
       ano: parseInt(ano),
       mes,
       valor: numericValue,
       tesoureiro: tesoureiro.trim(),
-      dataLançamento: new Date().toISOString()
+      dataEntrega
     };
 
-    onSave(data);
-    onClose();
+    onSave(payload);
+
+    // Reset payment values so another payment can be launched
+    setValorText('');
+    setDataEntrega(getLocalDateString());
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px' }}>
+        
+        {/* Modal Header */}
         <div className="modal-header">
-          <h3 className="modal-title">
-            {initialData ? 'Lançar/Editar Dízimo' : 'Novo Lançamento'}
-          </h3>
+          <div>
+            <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Competência: {mes} / {ano}
+            </span>
+            <h3 className="modal-title" style={{ marginTop: '2px', fontSize: '18px' }}>
+              {dizimistaId ? getDizimistaName() : 'Novo Lançamento'}
+            </h3>
+          </div>
           <button className="modal-close" onClick={onClose}>
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          {/* Dizimista Selector */}
-          <div className="form-group">
+        {/* 1. Tither Selector (if not pre-selected) */}
+        {!initialData?.dizimistaId && (
+          <div className="form-group" style={{ marginBottom: '16px' }}>
             <label className="form-label">Dizimista</label>
             <select 
               className="form-control" 
               value={dizimistaId} 
-              onChange={(e) => handleDizimistaChange(e.target.value)}
-              disabled={!!initialData?.dizimistaId}
+              onChange={(e) => setDizimistaId(e.target.value)}
               required
             >
               <option value="">Selecione um dizimista...</option>
@@ -168,76 +187,130 @@ export default function ModalLancamento({
               ))}
             </select>
           </div>
+        )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            {/* Ano Selector */}
-            <div className="form-group">
-              <label className="form-label">Ano</label>
-              <select 
-                className="form-control" 
-                value={ano} 
-                onChange={(e) => setAno(e.target.value)}
-                disabled={!!initialData?.ano}
-                required
-              >
-                {Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - 3 + i).map(y => (
-                  <option key={y} value={y}>{y}</option>
+        {/* 2. List of existing payments for this month */}
+        {dizimistaId && (
+          <div style={{ marginBottom: '20px' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-title)', textTransform: 'uppercase', marginBottom: '8px', textAlign: 'left' }}>
+              Entregas no Mês
+            </h4>
+            
+            {monthPayments.length === 0 ? (
+              <div style={{ padding: '16px', backgroundColor: 'var(--bg-app)', border: '1px dashed var(--border)', borderRadius: 'var(--radius-md)', color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center' }}>
+                Nenhum dízimo registrado nesta competência.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '180px', overflowY: 'auto' }}>
+                {monthPayments.map((p) => (
+                  <div 
+                    key={p.id} 
+                    style={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      padding: '10px 12px', 
+                      backgroundColor: 'var(--bg-app)', 
+                      border: '1px solid var(--border)', 
+                      borderRadius: 'var(--radius-sm)' 
+                    }}
+                  >
+                    <div style={{ textAlign: 'left' }}>
+                      <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-title)' }}>
+                        {formatCurrency(p.valor)}
+                      </div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                        Data: {formatDateFriendly(p.dataEntrega || p.dataLançamento)} • Tesoureiro: {p.tesoureiro}
+                      </div>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => onDelete(p.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', padding: '4px' }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 ))}
-              </select>
+
+                {/* Total Box */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 12px', backgroundColor: 'var(--primary)', color: 'white', borderRadius: 'var(--radius-sm)', fontSize: '13px', fontWeight: 'bold' }}>
+                  <span>Total Acumulado:</span>
+                  <span>{formatCurrency(totalMonth)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Divider */}
+        {dizimistaId && <div style={{ height: '1px', backgroundColor: 'var(--border)', margin: '20px 0' }}></div>}
+
+        {/* 3. Add contribution Form */}
+        {dizimistaId && (
+          <form onSubmit={handleAddPayment} style={{ textAlign: 'left' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-title)', textTransform: 'uppercase', marginBottom: '12px' }}>
+              Registrar Nova Entrega
+            </h4>
+
+            {/* Date Input */}
+            <div className="form-group">
+              <label className="form-label" style={{ fontSize: '11px' }}>Data da Entrega</label>
+              <div style={{ position: 'relative' }}>
+                <input 
+                  type="date" 
+                  className="form-control"
+                  style={{ paddingLeft: '12px' }}
+                  value={dataEntrega}
+                  onChange={(e) => setDataEntrega(e.target.value)}
+                  required
+                />
+              </div>
             </div>
 
-            {/* Mes Selector */}
-            <div className="form-group">
-              <label className="form-label">Mês</label>
-              <select 
-                className="form-control" 
-                value={mes} 
-                onChange={(e) => setMes(e.target.value)}
-                disabled={!!initialData?.mes}
-                required
-              >
-                {meses.map(m => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '12px' }}>
+              {/* Valor Input */}
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: '11px' }}>Valor do Dízimo</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="R$ 0,00"
+                  value={valorText}
+                  onChange={handleCurrencyInput}
+                  required
+                />
+              </div>
+
+              {/* Treasurer Input */}
+              <div className="form-group">
+                <label className="form-label" style={{ fontSize: '11px' }}>Tesoureiro(a)</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="Nome do tesoureiro..."
+                  value={tesoureiro}
+                  onChange={(e) => setTesoureiro(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Valor Input */}
-          <div className="form-group">
-            <label className="form-label">Valor do Dízimo</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              placeholder="R$ 0,00"
-              value={valorText}
-              onChange={handleCurrencyInput}
-              required
-            />
-          </div>
-
-          {/* Tesoureiro Input */}
-          <div className="form-group">
-            <label className="form-label">Tesoureiro(a)</label>
-            <input 
-              type="text" 
-              className="form-control" 
-              placeholder="Ex: Dc. Suzana Lima"
-              value={tesoureiro}
-              onChange={(e) => setTesoureiro(e.target.value)}
-              required
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
-              Cancelar
+            <button type="submit" className="btn btn-primary" style={{ marginTop: '12px' }}>
+              <Plus size={16} /> Adicionar Lançamento
             </button>
-            <button type="submit" className="btn btn-primary">
-              Confirmar Lançamento
-            </button>
-          </div>
-        </form>
+          </form>
+        )}
+
+        {/* Close Button */}
+        <button 
+          type="button" 
+          className="btn btn-secondary" 
+          onClick={onClose}
+          style={{ marginTop: '16px' }}
+        >
+          Fechar
+        </button>
       </div>
     </div>
   );
