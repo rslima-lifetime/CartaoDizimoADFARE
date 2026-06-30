@@ -306,14 +306,13 @@ export default function CartaoDizimo({
                     <div className="premium-church-title">Ministério Família Restaurada</div>
                   </div>
                 </div>
-                {/* Symmetrical metadata row - inline, very slim */}
                 <div className="premium-meta-row slim">
                   <div className="premium-meta-item">
-                    <span className="premium-meta-label">DIZIMISTA:</span>
+                    <span className="premium-meta-label">DIZIMISTA</span>
                     <span className="premium-meta-value">{getDizimistaFullName()}</span>
                   </div>
                   <div className="premium-meta-item text-right">
-                    <span className="premium-meta-label">EXERCÍCIO:</span>
+                    <span className="premium-meta-label">EXERCÍCIO</span>
                     <span className="premium-meta-value">{selectedYear}</span>
                   </div>
                 </div>

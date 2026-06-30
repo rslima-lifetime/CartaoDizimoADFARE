@@ -618,14 +618,17 @@ select.form-control:focus {
 
 .premium-meta-item {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
   font-size: 11px;
+  flex: 1;
 }
 
 .premium-meta-item.text-right {
-  justify-content: flex-end;
+  align-items: flex-end;
   text-align: right;
+  flex: 0 0 auto;
 }
 
 .premium-meta-label {
@@ -633,12 +636,15 @@ select.form-control:focus {
   color: #64748b;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  font-size: 9px;
 }
 
 .premium-meta-value {
   font-weight: 850;
   color: #0f172a;
   text-transform: uppercase;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 /* 1. Layout: Tabela Tradicional Modernizada */
