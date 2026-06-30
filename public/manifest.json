@@ -1,0 +1,24 @@
+{
+  "short_name": "ADFARE Dízimos",
+  "name": "ADFARE Dízimos - Controle Digital",
+  "description": "Controle Digital de Dízimos da ADFARE",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo_adfare.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "display": "standalone",
+  "orientation": "portrait"
+}
