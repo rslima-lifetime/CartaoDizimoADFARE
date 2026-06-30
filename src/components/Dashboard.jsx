@@ -89,7 +89,6 @@ export default function Dashboard({
           onClick={toggleTheme} 
           style={{ 
             background: 'none', 
-            border: 'none', 
             cursor: 'pointer', 
             color: 'var(--text-main)',
             padding: '8px',

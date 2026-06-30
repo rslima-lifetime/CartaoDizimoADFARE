@@ -79,11 +79,6 @@ export default function Dizimistas({
       setEditingId(dizimista.id);
       setNome(dizimista.nome);
       setCargo(getFullCargoName(dizimista.cargo));
-      
-    if (dizimista) {
-      setEditingId(dizimista.id);
-      setNome(dizimista.nome);
-      setCargo(getFullCargoName(dizimista.cargo));
       setStatus(dizimista.status);
     } else {
       setEditingId(null);
