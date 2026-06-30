@@ -52,6 +52,9 @@ export default function CartaoDizimo({
   const formatDateAbbrev = (isoString) => {
     if (!isoString) return '';
     const date = new Date(isoString);
+    if (isNaN(date.getTime())) {
+      return isoString; // Retorna a string original se for um formato customizado como "06/02 - 19/02"
+    }
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     return `${day}/${month}`;

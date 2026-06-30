@@ -9,19 +9,36 @@ import ModalLancamento from './components/ModalLancamento';
 // Mock/Initial data to match user's attachment
 const INITIAL_DIZIMISTAS = [
   { id: '1', nome: 'Carlos Santos', cargo: 'Ev.', telefone: '11987654321', status: 'Ativo' },
-  { id: '2', nome: 'Suzana Lima', cargo: 'Dcsa.', telefone: '11999998888', status: 'Ativo' },
-  { id: '3', nome: 'Roberto Souza', cargo: 'Pb.', telefone: '11977776666', status: 'Ativo' }
+  { id: '2', nome: 'Carlos Noan', cargo: 'Presb.', telefone: '', status: 'Ativo' },
+  { id: '3', nome: 'Ednaldo Almeida', cargo: 'Dc.', telefone: '', status: 'Ativo' },
+  { id: '4', nome: 'Roberto Lima', cargo: 'Dc.', telefone: '', status: 'Ativo' },
+  { id: '5', nome: 'Roberto da Silva', cargo: 'Dc.', telefone: '', status: 'Ativo' }
 ];
 
 const INITIAL_LANCAMENTOS = [
-  {
-    dizimistaId: '1',
-    ano: 2026,
-    mes: 'JAN',
-    valor: 100.00,
-    tesoureiro: 'Dcsa. Suzana Lima',
-    dataLançamento: '2026-01-04T10:00:00.000Z'
-  }
+  // Ev. Carlos Santos
+  { dizimistaId: '1', ano: 2026, mes: 'JAN', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '2026-01-04T10:00:00.000Z' },
+  
+  // Presb. Carlos Noan
+  { dizimistaId: '2', ano: 2026, mes: 'JAN', valor: 270.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '09/01' },
+  { dizimistaId: '2', ano: 2026, mes: 'FEV', valor: 290.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '06/02 - 19/02' },
+  { dizimistaId: '2', ano: 2026, mes: 'MAR', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '06/03 - 29/03' },
+  { dizimistaId: '2', ano: 2026, mes: 'ABR', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '07/04 - 15/04' },
+  { dizimistaId: '2', ano: 2026, mes: 'MAI', valor: 576.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '01/05 - 05/05 - 18/05' },
+  { dizimistaId: '2', ano: 2026, mes: 'JUN', valor: 310.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '05/06 - 17/06' },
+
+  // Dc. Ednaldo Almeida
+  { dizimistaId: '3', ano: 2026, mes: 'JAN', valor: 148.41, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '08/01' },
+  { dizimistaId: '3', ano: 2026, mes: 'FEV', valor: 142.10, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '06/02' },
+  { dizimistaId: '3', ano: 2026, mes: 'ABR', valor: 116.78, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '07/04' },
+  { dizimistaId: '3', ano: 2026, mes: 'MAI', valor: 330.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '10/05' },
+  { dizimistaId: '3', ano: 2026, mes: 'JUN', valor: 268.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '08/06' },
+
+  // Dc. Roberto Lima
+  { dizimistaId: '4', ano: 2026, mes: 'JAN', valor: 60.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '09/01' },
+
+  // Dc. Roberto da Silva
+  { dizimistaId: '5', ano: 2026, mes: 'JAN', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataLançamento: '04/01' }
 ];
 
 export default function App() {
@@ -41,24 +58,35 @@ export default function App() {
 
   // Load data from localStorage on mount
   useEffect(() => {
-    const savedDizimistas = localStorage.getItem('adfare_dizimistas');
-    const savedLancamentos = localStorage.getItem('adfare_lancamentos');
-    const savedTheme = localStorage.getItem('adfare_theme') || 'light';
-
-    if (savedDizimistas) {
-      setDizimistas(JSON.parse(savedDizimistas));
-    } else {
+    const isV3Loaded = localStorage.getItem('adfare_loaded_v3');
+    
+    if (!isV3Loaded) {
+      // Force initial load of the official church records from user's screenshots
       setDizimistas(INITIAL_DIZIMISTAS);
-      localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
-    }
-
-    if (savedLancamentos) {
-      setLancamentos(JSON.parse(savedLancamentos));
-    } else {
       setLancamentos(INITIAL_LANCAMENTOS);
+      localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
       localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
+      localStorage.setItem('adfare_loaded_v3', 'true');
+    } else {
+      const savedDizimistas = localStorage.getItem('adfare_dizimistas');
+      const savedLancamentos = localStorage.getItem('adfare_lancamentos');
+      
+      if (savedDizimistas) {
+        setDizimistas(JSON.parse(savedDizimistas));
+      } else {
+        setDizimistas(INITIAL_DIZIMISTAS);
+        localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
+      }
+
+      if (savedLancamentos) {
+        setLancamentos(JSON.parse(savedLancamentos));
+      } else {
+        setLancamentos(INITIAL_LANCAMENTOS);
+        localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
+      }
     }
 
+    const savedTheme = localStorage.getItem('adfare_theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
