@@ -21,7 +21,21 @@ export default function Dizimistas({
   const [telefone, setTelefone] = useState('');
   const [status, setStatus] = useState('Ativo');
 
-  const cargos = ['Membro', 'Ev.', 'Pr.', 'Pb.', 'Dc.', 'Dcsa.', 'Miss.', 'Ob.'];
+  const cargos = ['Membro', 'Evangelista', 'Pastor', 'Presbítero', 'Diácono', 'Diaconisa', 'Missionário(a)', 'Obreiro(a)'];
+
+  const getFullCargoName = (cargo) => {
+    if (!cargo) return 'Membro';
+    const c = cargo.trim().toLowerCase();
+    if (c === 'membro' || c === 'nenhum' || c === '') return 'Membro';
+    if (c.startsWith('ev') || c === 'evangelista') return 'Evangelista';
+    if (c.startsWith('pr') || c === 'pastor') return 'Pastor';
+    if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Presbítero';
+    if (c.startsWith('dcsa') || c.startsWith('diaconis')) return 'Diaconisa';
+    if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Diácono';
+    if (c.startsWith('miss') || c === 'missionário' || c === 'missionária') return 'Missionário(a)';
+    if (c.startsWith('ob') || c === 'obreiro' || c === 'obreira') return 'Obreiro(a)';
+    return cargo;
+  };
 
   const formatCargoAbbrev = (cargo) => {
     if (!cargo) return '';
@@ -65,7 +79,7 @@ export default function Dizimistas({
     if (dizimista) {
       setEditingId(dizimista.id);
       setNome(dizimista.nome);
-      setCargo(dizimista.cargo || 'Membro');
+      setCargo(getFullCargoName(dizimista.cargo));
       
       const rawTel = dizimista.telefone || '';
       if (rawTel.startsWith('55')) {

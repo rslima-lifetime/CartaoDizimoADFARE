@@ -11,9 +11,9 @@ export default function CartaoDizimo({
   onCellClick 
 }) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [layoutMode, setLayoutMode] = useState('mosaic'); // default: 'mosaic' for modern grid view!
   const cardRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const meses = [
     { key: 'JAN', name: 'Janeiro' },
@@ -85,10 +85,14 @@ export default function CartaoDizimo({
     return cargo;
   };
 
+  const formatNameWithCargo = (cargo, nome) => {
+    const abbrev = formatCargoAbbrev(cargo);
+    return abbrev ? `${abbrev} ${nome}` : nome;
+  };
+
   const getDizimistaFullName = () => {
     if (!dizimista) return '';
-    const abbrev = formatCargoAbbrev(dizimista.cargo);
-    return abbrev ? `${abbrev} ${dizimista.nome}` : dizimista.nome;
+    return formatNameWithCargo(dizimista.cargo, dizimista.nome);
   };
 
   // Image Export handler using html2canvas
@@ -119,7 +123,7 @@ export default function CartaoDizimo({
     const dataUrl = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     const cleanName = dizimista.nome.toLowerCase().replace(/\s+/g, '_');
-    link.download = `cartao_dizimo_${cleanName}_${selectedYear}_${layoutMode}.png`;
+    link.download = `cartao_dizimo_${cleanName}_${selectedYear}.png`;
     link.href = dataUrl;
     link.click();
   };
@@ -217,6 +221,14 @@ export default function CartaoDizimo({
           {/* Tither selector */}
           <div className="form-group" style={{ margin: 0 }}>
             <label className="form-label" style={{ fontSize: '11px' }}><User size={10} /> Dizimista</label>
+            <input 
+              type="text"
+              placeholder="🔍 Buscar nome..."
+              className="form-control"
+              style={{ padding: '6px 10px', fontSize: '12px', marginBottom: '6px', height: 'auto' }}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
             <select 
               className="form-control" 
               style={{ padding: '8px', fontSize: '13px' }}
@@ -224,11 +236,13 @@ export default function CartaoDizimo({
               onChange={(e) => setSelectedDizimistaId(e.target.value)}
             >
               <option value="">Selecione...</option>
-              {dizimistas.map(d => (
-                <option key={d.id} value={d.id}>
-                  {d.cargo ? `${d.cargo} ` : ''}{d.nome}
-                </option>
-              ))}
+              {dizimistas
+                .filter(d => d.id === selectedDizimistaId || formatNameWithCargo(d.cargo, d.nome).toLowerCase().includes(searchQuery.toLowerCase()))
+                .map(d => (
+                  <option key={d.id} value={d.id}>
+                    {formatNameWithCargo(d.cargo, d.nome)}
+                  </option>
+                ))}
             </select>
           </div>
 
@@ -249,23 +263,7 @@ export default function CartaoDizimo({
         </div>
       </div>
 
-      {/* Layout toggle selector */}
-      {selectedDizimistaId && (
-        <div className="layout-selector">
-          <button 
-            className={`layout-btn ${layoutMode === 'mosaic' ? 'active' : ''}`}
-            onClick={() => setLayoutMode('mosaic')}
-          >
-            <Grid size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> Mosaico Premium
-          </button>
-          <button 
-            className={`layout-btn ${layoutMode === 'table' ? 'active' : ''}`}
-            onClick={() => setLayoutMode('table')}
-          >
-            <Table size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> Tabela Moderna
-          </button>
-        </div>
-      )}
+
 
       {/* Empty State */}
       {!selectedDizimistaId && (
@@ -292,106 +290,67 @@ export default function CartaoDizimo({
               }}
             >
               {/* Card Header */}
-              <div className="tithing-card-header">
-                <div className="tithing-card-logo-container">
-                  <LogoADFARE />
-                </div>
-                <div className="tithing-card-info">
-                  <div className="tithing-card-church-name">
-                    A.D MINISTÉRIO FAMÍLIA RESTAURADA
+              <div className="tithing-card-header premium-header compact">
+                {/* Horizontal top row: Logo + Title */}
+                <div className="premium-top-row">
+                  <div className="premium-logo-wrapper">
+                    <LogoADFARE style={{ height: '50px', width: 'auto' }} />
                   </div>
-                  <div className="tithing-card-meta-grid">
-                    <div className="tithing-card-meta-item">
-                      NOME: <span style={{ textTransform: 'uppercase' }}>{getDizimistaFullName()}</span>
-                    </div>
-                    <div className="tithing-card-meta-item" style={{ textAlign: 'right' }}>
-                      ANO: <span>{selectedYear}</span>
-                    </div>
+                  <div className="premium-church-info">
+                    <div className="premium-church-subtitle">Assembleia de Deus</div>
+                    <div className="premium-church-title">Ministério Família Restaurada</div>
+                  </div>
+                </div>
+                {/* Symmetrical metadata row - inline, very slim */}
+                <div className="premium-meta-row slim">
+                  <div className="premium-meta-item">
+                    <span className="premium-meta-label">DIZIMISTA:</span>
+                    <span className="premium-meta-value">{getDizimistaFullName()}</span>
+                  </div>
+                  <div className="premium-meta-item text-right">
+                    <span className="premium-meta-label">EXERCÍCIO:</span>
+                    <span className="premium-meta-value">{selectedYear}</span>
                   </div>
                 </div>
               </div>
 
-              {layoutMode === 'table' ? (
-                /* Layout 1: Modernized Table */
-                <table className="modern-table">
-                  <thead>
-                    <tr>
-                      <th>MÊS</th>
-                      <th>DÍZIMO</th>
-                      <th>TESOUREIRO</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {meses.map((m) => {
-                      const tx = getContributionForMonth(m.key);
-                      if (tx) {
-                        return (
-                          <tr 
-                            key={m.key} 
-                            onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
-                          >
-                            <td className="col-month">{m.key}</td>
-                            <td className="col-value">
-                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)}
-                            </td>
-                            <td className="col-treasurer">{tx.tesoureiro}</td>
-                          </tr>
-                        );
-                      } else {
-                        return (
-                          <tr 
-                            key={m.key} 
-                            className="empty-row"
-                            onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
-                          >
-                            <td className="col-month">{m.key}</td>
-                            <td className="col-value"></td>
-                            <td className="col-treasurer"></td>
-                          </tr>
-                        );
-                      }
-                    })}
-                  </tbody>
-                </table>
-              ) : (
-                /* Layout 2: Modern Mosaic Grid */
-                <div className="mosaic-grid">
-                  {meses.map((m) => {
-                    const tx = getContributionForMonth(m.key);
-                    const isPaid = !!tx;
-                    const is13 = m.key === '13º';
-                    
-                    return (
-                      <div 
-                        key={m.key}
-                        className={`mosaic-tile ${isPaid ? 'paid' : 'unpaid'} ${is13 ? 'tile-13' : ''}`}
-                        onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
-                      >
-                        <div className="tile-month-name">{m.key}</div>
-                        
-                        {isPaid ? (
-                          <>
-                            <div className="tile-badge"><Check size={10} strokeWidth={3} /></div>
-                            <div className="tile-value">
-                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(tx.valor)}
-                            </div>
-                            <div className="tile-footer" style={{ marginTop: '2px' }}>
-                              Por: {tx.tesoureiro.split(' ').slice(-1)[0]}
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div style={{ color: '#cbd5e1', fontSize: '16px', fontWeight: 'light', margin: '4px 0' }}>-</div>
-                            <div className="tile-footer" style={{ fontStyle: 'italic', color: '#94a3b8' }}>
-                              Em aberto
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              {/* Layout 2: Modern Mosaic Grid */}
+              <div className="mosaic-grid">
+                {meses.map((m) => {
+                  const tx = getContributionForMonth(m.key);
+                  const isPaid = !!tx;
+                  const is13 = m.key === '13º';
+                  
+                  return (
+                    <div 
+                      key={m.key}
+                      className={`mosaic-tile ${isPaid ? 'paid' : 'unpaid'} ${is13 ? 'tile-13' : ''}`}
+                      onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
+                    >
+                      <div className="tile-month-name">{m.key}</div>
+                      
+                      {isPaid ? (
+                        <>
+                          <div className="tile-badge"><Check size={10} strokeWidth={3} /></div>
+                          <div className="tile-value">
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(tx.valor)}
+                          </div>
+                          <div className="tile-footer" style={{ marginTop: '2px' }}>
+                            Por: {tx.tesoureiro}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div style={{ color: '#cbd5e1', fontSize: '16px', fontWeight: 'light', margin: '4px 0' }}>-</div>
+                          <div className="tile-footer" style={{ fontStyle: 'italic', color: '#94a3b8' }}>
+                            Em aberto
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
 
               {/* Card Footer Quote */}
               <div className="tithing-card-footer">

@@ -280,11 +280,12 @@ export default function App() {
   };
 
   const handleEditLancamento = (tx) => {
-    // Pre-fill and open modal
+    // Pre-fill and open modal with specific transaction ID
     setModalInitialData({
       dizimistaId: tx.dizimistaId,
       ano: tx.ano,
-      mes: tx.mes
+      mes: tx.mes,
+      editLaunchId: tx.id
     });
     setIsModalOpen(true);
   };

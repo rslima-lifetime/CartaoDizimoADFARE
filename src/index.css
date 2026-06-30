@@ -527,50 +527,96 @@ body {
   box-shadow: 0 15px 35px rgba(0,0,0,0.06);
 }
 
-/* Header style for shared cards */
-.tithing-card-header {
+/* Header style for shared cards - Compact Premium Layout */
+.tithing-card-header.premium-header.compact {
   display: flex;
+  flex-direction: column;
   align-items: center;
   border-bottom: 2px solid #e9ecef;
-  padding-bottom: 16px;
-  margin-bottom: 18px;
-  gap: 16px;
+  padding: 16px 20px 12px 20px;
+  margin-bottom: 14px;
+  gap: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.tithing-card-logo-container {
-  width: 72px;
-  height: 72px;
+.premium-top-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.premium-logo-wrapper {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.tithing-card-info {
-  flex: 1;
+.premium-church-info {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.tithing-card-church-name {
-  font-size: 14px;
-  font-weight: 800;
-  color: #1e3a8a;
-  letter-spacing: 0.8px;
-  margin-bottom: 6px;
-  line-height: 1.3;
-}
-
-.tithing-card-meta-grid {
-  display: grid;
-  grid-template-columns: 3fr 1fr;
+.premium-church-subtitle {
   font-size: 11px;
-  gap: 4px;
+  font-weight: 850;
+  color: #c2410c; /* Accent color from ADFARE flame logo */
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+  line-height: 1;
 }
 
-.tithing-card-meta-item {
-  color: #6c757d;
-  line-height: 1.4;
+.premium-church-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  line-height: 1.2;
 }
 
-.tithing-card-meta-item span {
-  font-weight: 700;
-  color: #212529;
+.premium-meta-row.slim {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 10px;
+  gap: 8px;
+}
+
+.premium-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.premium-meta-item.text-right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.premium-meta-label {
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.premium-meta-value {
+  font-weight: 850;
+  color: #0f172a;
+  text-transform: uppercase;
 }
 
 /* 1. Layout: Tabela Tradicional Modernizada */

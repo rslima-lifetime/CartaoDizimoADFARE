@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, Calendar, DollarSign, UserCheck, Plus } from 'lucide-react';
+import { X, Trash2, Calendar, DollarSign, UserCheck, Plus, Edit } from 'lucide-react';
 
 export default function ModalLancamento({ 
   isOpen, 
@@ -18,6 +18,9 @@ export default function ModalLancamento({
   const [dataEntrega, setDataEntrega] = useState('');
   const [valorText, setValorText] = useState('');
   const [tesoureiro, setTesoureiro] = useState('');
+
+  // Edit mode tracking state
+  const [editingId, setEditingId] = useState(null);
 
   const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ', '13º'];
 
@@ -64,6 +67,18 @@ export default function ModalLancamento({
         setDizimistaId(initialData.dizimistaId || '');
         setAno(initialData.ano || new Date().getFullYear());
         setMes(initialData.mes || 'JAN');
+
+        // Check if we are editing a specific transaction passed from outside
+        if (initialData.editLaunchId) {
+          const tx = lancamentos.find(l => l.id === initialData.editLaunchId);
+          if (tx) {
+            setEditingId(tx.id);
+            setDataEntrega(tx.dataEntrega || getLocalDateString());
+            setValorText(formatCurrency(tx.valor));
+            setTesoureiro(tx.tesoureiro);
+            return;
+          }
+        }
       } else {
         setDizimistaId('');
         setAno(new Date().getFullYear());
@@ -71,6 +86,7 @@ export default function ModalLancamento({
       }
 
       // 2. Clear inputs for new entry
+      setEditingId(null);
       setDataEntrega(getLocalDateString());
       setValorText('');
 
@@ -106,7 +122,14 @@ export default function ModalLancamento({
     return dateStr;
   };
 
-  // Add delivery submit handler
+  const handleStartEdit = (p) => {
+    setEditingId(p.id);
+    setDataEntrega(p.dataEntrega || getLocalDateString());
+    setValorText(formatCurrency(p.valor));
+    setTesoureiro(p.tesoureiro);
+  };
+
+  // Add/Edit delivery submit handler
   const handleAddPayment = (e) => {
     e.preventDefault();
     if (!dizimistaId) {
@@ -114,7 +137,7 @@ export default function ModalLancamento({
       return;
     }
     if (!dataEntrega || !valorText || !tesoureiro.trim()) {
-      alert('Por favor, preencha todos os campos da nova entrega.');
+      alert('Por favor, preencha todos os campos.');
       return;
     }
 
@@ -133,6 +156,7 @@ export default function ModalLancamento({
     }
 
     const payload = {
+      id: editingId || undefined,
       dizimistaId,
       ano: parseInt(ano),
       mes,
@@ -144,6 +168,7 @@ export default function ModalLancamento({
     onSave(payload);
 
     // Reset payment values so another payment can be launched
+    setEditingId(null);
     setValorText('');
     setDataEntrega(getLocalDateString());
   };
@@ -223,13 +248,24 @@ export default function ModalLancamento({
                         Data: {formatDateFriendly(p.dataEntrega || p.dataLançamento)} • Tesoureiro: {p.tesoureiro}
                       </div>
                     </div>
-                    <button 
-                      type="button" 
-                      onClick={() => onDelete(p.id)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', padding: '4px' }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button 
+                        type="button" 
+                        onClick={() => handleStartEdit(p)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--primary)', padding: '4px' }}
+                        title="Editar"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => onDelete(p.id)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', padding: '4px' }}
+                        title="Excluir"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 ))}
 
@@ -246,11 +282,11 @@ export default function ModalLancamento({
         {/* Divider */}
         {dizimistaId && <div style={{ height: '1px', backgroundColor: 'var(--border)', margin: '20px 0' }}></div>}
 
-        {/* 3. Add contribution Form */}
+        {/* 3. Add/Edit contribution Form */}
         {dizimistaId && (
           <form onSubmit={handleAddPayment} style={{ textAlign: 'left' }}>
             <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-title)', textTransform: 'uppercase', marginBottom: '12px' }}>
-              Registrar Nova Entrega
+              {editingId ? 'Editar Lançamento' : 'Registrar Nova Entrega'}
             </h4>
 
             {/* Date Input */}
@@ -296,9 +332,25 @@ export default function ModalLancamento({
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ marginTop: '12px' }}>
-              <Plus size={16} /> Adicionar Lançamento
-            </button>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+              <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>
+                {editingId ? 'Salvar Alterações' : 'Adicionar Lançamento'}
+              </button>
+              {editingId && (
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  style={{ width: 'auto', padding: '0 12px' }}
+                  onClick={() => {
+                    setEditingId(null);
+                    setValorText('');
+                    setDataEntrega(getLocalDateString());
+                  }}
+                >
+                  Cancelar Edição
+                </button>
+              )}
+            </div>
           </form>
         )}
 
