@@ -97,7 +97,7 @@ export default function Dashboard({
 
         <div className="stat-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="stat-label">Total do Ano ({currentYear})</span>
+            <span className="stat-label">Total Ano ({currentYear})</span>
             <DollarSign size={18} color="var(--primary)" />
           </div>
           <div className="stat-value">
