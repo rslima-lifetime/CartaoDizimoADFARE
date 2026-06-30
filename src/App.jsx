@@ -21,7 +21,12 @@ const INITIAL_DIZIMISTAS = [
   { id: '11', nome: 'Flávia Lima', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
   { id: '12', nome: 'Taiane Santos', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
   { id: '13', nome: 'Laís Azeredo', cargo: 'Obr.', telefone: '', status: 'Ativo' },
-  { id: '14', nome: 'Tatiane Simas', cargo: 'Dcsa.', telefone: '', status: 'Ativo' }
+  { id: '14', nome: 'Tatiane Simas', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
+  { id: '15', nome: 'Luzinete Correa', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
+  { id: '16', nome: 'Alexia da Silva', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
+  { id: '17', nome: 'Isabelly Felix', cargo: 'Membro', telefone: '', status: 'Ativo' },
+  { id: '18', nome: 'Joice dos Santos', cargo: 'Membro', telefone: '', status: 'Ativo' },
+  { id: '19', nome: 'Rosane Oliveira', cargo: 'Membro', telefone: '', status: 'Ativo' }
 ];
 
 const INITIAL_LANCAMENTOS = [
@@ -115,7 +120,38 @@ const INITIAL_LANCAMENTOS = [
   { id: 'l60', dizimistaId: '14', ano: 2026, mes: 'MAR', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-19' },
   { id: 'l61', dizimistaId: '14', ano: 2026, mes: 'ABR', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-18' },
   { id: 'l62', dizimistaId: '14', ano: 2026, mes: 'MAI', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-20' },
-  { id: 'l63', dizimistaId: '14', ano: 2026, mes: 'JUN', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-18' }
+  { id: 'l63', dizimistaId: '14', ano: 2026, mes: 'JUN', valor: 65.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-18' },
+
+  // Dcsa. Luzinete Correa
+  { id: 'l64', dizimistaId: '15', ano: 2026, mes: 'JAN', valor: 85.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-31' },
+  { id: 'l65', dizimistaId: '15', ano: 2026, mes: 'FEV', valor: 115.15, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-28' },
+  { id: 'l66', dizimistaId: '15', ano: 2026, mes: 'MAR', valor: 40.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-04' },
+  { id: 'l67', dizimistaId: '15', ano: 2026, mes: 'ABR', valor: 112.33, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-02' },
+  { id: 'l68', dizimistaId: '15', ano: 2026, mes: 'MAI', valor: 103.83, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-01' },
+  { id: 'l69', dizimistaId: '15', ano: 2026, mes: 'MAI', valor: 103.83, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-18' },
+  { id: 'l70', dizimistaId: '15', ano: 2026, mes: 'MAI', valor: 103.83, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-30' },
+
+  // Dcsa. Alexia da Silva
+  { id: 'l71', dizimistaId: '16', ano: 2026, mes: 'JAN', valor: 248.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-02' },
+  { id: 'l72', dizimistaId: '16', ano: 2026, mes: 'ABR', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-30' },
+
+  // Isabelly Felix
+  { id: 'l73', dizimistaId: '17', ano: 2026, mes: 'FEV', valor: 171.84, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-03' },
+  { id: 'l74', dizimistaId: '17', ano: 2026, mes: 'MAR', valor: 185.93, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-01' },
+  { id: 'l75', dizimistaId: '17', ano: 2026, mes: 'ABR', valor: 199.99, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-06' },
+  { id: 'l76', dizimistaId: '17', ano: 2026, mes: 'MAI', valor: 208.14, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-01' },
+  { id: 'l77', dizimistaId: '17', ano: 2026, mes: 'MAI', valor: 208.14, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-30' },
+
+  // Joice dos Santos
+  { id: 'l78', dizimistaId: '18', ano: 2026, mes: 'FEV', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-08' },
+  { id: 'l79', dizimistaId: '18', ano: 2026, mes: 'MAR', valor: 120.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-31' },
+  { id: 'l80', dizimistaId: '18', ano: 2026, mes: 'ABR', valor: 120.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-01' },
+  { id: 'l81', dizimistaId: '18', ano: 2026, mes: 'MAI', valor: 120.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-03' },
+
+  // Rosane Oliveira
+  { id: 'l82', dizimistaId: '19', ano: 2026, mes: 'ABR', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-05' },
+  { id: 'l83', dizimistaId: '19', ano: 2026, mes: 'MAI', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-08' },
+  { id: 'l84', dizimistaId: '19', ano: 2026, mes: 'JUN', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-01' }
 ];
 
 export default function App() {
@@ -135,15 +171,15 @@ export default function App() {
 
   // Load data from localStorage on mount
   useEffect(() => {
-    const isV6Loaded = localStorage.getItem('adfare_loaded_v6');
+    const isV7Loaded = localStorage.getItem('adfare_loaded_v7');
     
-    if (!isV6Loaded) {
-      // Force initial load of the official church records from user's screenshots (with multi-payment support - v6 database)
+    if (!isV7Loaded) {
+      // Force initial load of the official church records from user's screenshots (with multi-payment support - v7 database)
       setDizimistas(INITIAL_DIZIMISTAS);
       setLancamentos(INITIAL_LANCAMENTOS);
       localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
       localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
-      localStorage.setItem('adfare_loaded_v6', 'true');
+      localStorage.setItem('adfare_loaded_v7', 'true');
     } else {
       const savedDizimistas = localStorage.getItem('adfare_dizimistas');
       const savedLancamentos = localStorage.getItem('adfare_lancamentos');
