@@ -218,7 +218,7 @@ export default function App() {
     if (savedTesoureiros) {
       setTesoureiros(JSON.parse(savedTesoureiros));
     } else {
-      const defaultTesoureiros = ['Dcsa. Suzana Lima'];
+      const defaultTesoureiros = ['Dcsa. Suzana'];
       setTesoureiros(defaultTesoureiros);
       localStorage.setItem('adfare_tesoureiros', JSON.stringify(defaultTesoureiros));
     }
