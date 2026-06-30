@@ -71,9 +71,24 @@ export default function CartaoDizimo({
     return `${day}/${month}`;
   };
 
+  const formatCargoAbbrev = (cargo) => {
+    if (!cargo) return '';
+    const c = cargo.trim().toLowerCase();
+    if (c === 'membro' || c === 'nenhum' || c === '') return '';
+    if (c.startsWith('ev') || c === 'evangelista') return 'Ev.';
+    if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
+    if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Pb.';
+    if (c.startsWith('dcsa') || c.startsWith('diaconis')) return 'Dcsa.';
+    if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Dc.';
+    if (c.startsWith('miss') || c === 'missionário' || c === 'missionária') return 'Miss.';
+    if (c.startsWith('ob') || c === 'obreiro' || c === 'obreira') return 'Ob.';
+    return cargo;
+  };
+
   const getDizimistaFullName = () => {
     if (!dizimista) return '';
-    return dizimista.cargo ? `${dizimista.cargo} ${dizimista.nome}` : dizimista.nome;
+    const abbrev = formatCargoAbbrev(dizimista.cargo);
+    return abbrev ? `${abbrev} ${dizimista.nome}` : dizimista.nome;
   };
 
   // Image Export handler using html2canvas
@@ -178,7 +193,9 @@ export default function CartaoDizimo({
 
     text += `\n_A Tesouraria, em nome do Ministério Família Restaurada, agradece a sua fidelidade e roga a Deus que supra todas as suas necessidades, em Glória, por Cristo Jesus! 🙌_`;
 
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=55${dizimista.telefone || ''}&text=${encodeURIComponent(text)}`;
+    const rawPhone = dizimista.telefone || '';
+    const phone = rawPhone.startsWith('55') ? rawPhone : (rawPhone ? '55' + rawPhone : '');
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');
   };
 

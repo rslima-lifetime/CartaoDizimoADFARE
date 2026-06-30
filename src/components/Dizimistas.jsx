@@ -21,15 +21,58 @@ export default function Dizimistas({
   const [telefone, setTelefone] = useState('');
   const [status, setStatus] = useState('Ativo');
 
-  const cargos = ['Membro', 'Cooperador', 'Diácono', 'Dcsa. (Diaconisa)', 'Presbítero', 'Evangelista', 'Pastor', 'Missionária'];
+  const cargos = ['Membro', 'Ev.', 'Pr.', 'Pb.', 'Dc.', 'Dcsa.', 'Miss.', 'Ob.'];
+
+  const formatCargoAbbrev = (cargo) => {
+    if (!cargo) return '';
+    const c = cargo.trim().toLowerCase();
+    if (c === 'membro' || c === 'nenhum' || c === '') return '';
+    if (c.startsWith('ev') || c === 'evangelista') return 'Ev.';
+    if (c.startsWith('pr') || c === 'pastor') return 'Pr.';
+    if (c.startsWith('pb') || c.startsWith('presb') || c === 'presbítero') return 'Pb.';
+    if (c.startsWith('dcsa') || c.startsWith('diaconis')) return 'Dcsa.';
+    if (c.startsWith('dc') || c.startsWith('diac') || c === 'diácono') return 'Dc.';
+    if (c.startsWith('miss') || c === 'missionário' || c === 'missionária') return 'Miss.';
+    if (c.startsWith('ob') || c === 'obreiro' || c === 'obreira') return 'Ob.';
+    return cargo;
+  };
+
+  const formatNameWithCargo = (cargo, nome) => {
+    const abbrev = formatCargoAbbrev(cargo);
+    return abbrev ? `${abbrev} ${nome}` : nome;
+  };
+
+  const formatPhoneFriendly = (phone) => {
+    if (!phone) return '';
+    const clean = phone.replace(/\D/g, '');
+    if (clean.length === 13 && clean.startsWith('55')) {
+      const ddd = clean.substring(2, 4);
+      const first = clean.substring(4, 9);
+      const second = clean.substring(9);
+      return `+55 (${ddd}) ${first}-${second}`;
+    }
+    if (clean.length === 11) {
+      const ddd = clean.substring(0, 2);
+      const first = clean.substring(2, 7);
+      const second = clean.substring(7);
+      return `(${ddd}) ${first}-${second}`;
+    }
+    return phone;
+  };
 
   // Handle open Form
   const openForm = (dizimista = null) => {
     if (dizimista) {
       setEditingId(dizimista.id);
       setNome(dizimista.nome);
-      setCargo(dizimista.cargo || '');
-      setTelefone(dizimista.telefone || '');
+      setCargo(dizimista.cargo || 'Membro');
+      
+      const rawTel = dizimista.telefone || '';
+      if (rawTel.startsWith('55')) {
+        setTelefone(rawTel.substring(2));
+      } else {
+        setTelefone(rawTel);
+      }
       setStatus(dizimista.status);
     } else {
       setEditingId(null);
@@ -48,10 +91,16 @@ export default function Dizimistas({
       return;
     }
 
+    const cleanedLocal = telefone.replace(/\D/g, '');
+    let finalPhone = '';
+    if (cleanedLocal) {
+      finalPhone = cleanedLocal.startsWith('55') ? cleanedLocal : '55' + cleanedLocal;
+    }
+
     const data = {
       nome: nome.trim(),
       cargo,
-      telefone: telefone.replace(/\D/g, ''), // Save only digits
+      telefone: finalPhone,
       status
     };
 
@@ -149,7 +198,7 @@ export default function Dizimistas({
                 >
                   <div style={{ textAlign: 'left' }}>
                     <h4 style={{ fontSize: '15px', fontWeight: '700', color: 'var(--text-title)' }}>
-                      {d.cargo ? `${d.cargo} ` : ''}{d.nome}
+                      {formatNameWithCargo(d.cargo, d.nome)}
                     </h4>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
                       <span className={`badge ${d.status === 'Ativo' ? 'badge-success' : 'badge-danger'}`}>
@@ -157,7 +206,7 @@ export default function Dizimistas({
                       </span>
                       {d.telefone && (
                         <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                          📞 {d.telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')}
+                          📞 {formatPhoneFriendly(d.telefone)}
                         </span>
                       )}
                     </div>
@@ -192,7 +241,7 @@ export default function Dizimistas({
           <div className="card" style={{ textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div>
               <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--primary)', textTransform: 'uppercase' }}>
-                {selectedDizimista.cargo || 'Membro'}
+                {formatCargoAbbrev(selectedDizimista.cargo) || 'Membro'}
               </span>
               <h2 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-title)', marginTop: '2px' }}>
                 {selectedDizimista.nome}
@@ -208,7 +257,7 @@ export default function Dizimistas({
                   href={`tel:${selectedDizimista.telefone}`}
                   style={{ textDecoration: 'none', color: 'var(--primary)', fontWeight: '600', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
-                  <Phone size={14} /> {selectedDizimista.telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')}
+                  <Phone size={14} /> {formatPhoneFriendly(selectedDizimista.telefone)}
                 </a>
               </div>
             )}
@@ -302,13 +351,32 @@ export default function Dizimistas({
               {/* Telefone */}
               <div className="form-group">
                 <label className="form-label">Telefone (DDD + Celular)</label>
-                <input 
-                  type="tel" 
-                  className="form-control" 
-                  placeholder="Ex: 11987654321"
-                  value={telefone}
-                  onChange={(e) => setTelefone(e.target.value)}
-                />
+                <div style={{ display: 'flex', alignItems: 'stretch' }}>
+                  <span style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '0 12px',
+                    backgroundColor: 'var(--bg-app)',
+                    border: '1px solid var(--border)',
+                    borderRight: 'none',
+                    borderRadius: 'var(--radius-sm) 0 0 var(--radius-sm)',
+                    fontSize: '14px',
+                    fontWeight: 'bold',
+                    color: 'var(--text-muted)'
+                  }}>
+                    +55
+                  </span>
+                  <input 
+                    type="tel" 
+                    className="form-control" 
+                    style={{
+                      borderRadius: '0 var(--radius-sm) var(--radius-sm) 0'
+                    }}
+                    placeholder="Ex: 11987654321"
+                    value={telefone}
+                    onChange={(e) => setTelefone(e.target.value)}
+                  />
+                </div>
               </div>
 
               {/* Status */}
