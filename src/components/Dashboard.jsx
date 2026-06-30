@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { DollarSign, Users, Calendar, Plus, Download, Upload, ShieldAlert, UserCog, Trash2 } from 'lucide-react';
+import { DollarSign, Users, Calendar, Plus, Download, Upload, ShieldAlert, UserCog, Trash2, Moon, Sun } from 'lucide-react';
 import LogoADFARE from './LogoADFARE';
 
 export default function Dashboard({ 
@@ -10,7 +10,9 @@ export default function Dashboard({
   importData,
   tesoureiros = [],
   onAddTesoureiro,
-  onRemoveTesoureiro
+  onRemoveTesoureiro,
+  theme,
+  toggleTheme
 }) {
   const fileInputRef = useRef(null);
   const [novoTesoureiro, setNovoTesoureiro] = useState('');
@@ -69,18 +71,39 @@ export default function Dashboard({
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ width: '60px', height: '60px' }}>
-          <LogoADFARE />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '60px', height: '60px' }}>
+            <LogoADFARE />
+          </div>
+          <div style={{ textAlign: 'left' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-title)', lineHeight: '1.2' }}>
+              AD Família Restaurada
+            </h2>
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+              Painel Administrativo de Dízimos
+            </span>
+          </div>
         </div>
-        <div style={{ textAlign: 'left' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-title)', lineHeight: '1.2' }}>
-            AD Família Restaurada
-          </h2>
-          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-            Painel Administrativo de Dízimos
-          </span>
-        </div>
+        <button 
+          onClick={toggleTheme} 
+          style={{ 
+            background: 'none', 
+            border: 'none', 
+            cursor: 'pointer', 
+            color: 'var(--text-main)',
+            padding: '8px',
+            borderRadius: 'var(--radius-sm)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            boxShadow: 'var(--shadow-sm)'
+          }}
+        >
+          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+        </button>
       </div>
 
       {/* Metrics Widgets */}

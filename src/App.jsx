@@ -357,39 +357,6 @@ export default function App() {
 
   return (
     <>
-      {/* Top Header */}
-      <header 
-        style={{ 
-          height: '60px', 
-          backgroundColor: 'var(--bg-card)', 
-          borderBottom: '1px solid var(--border)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0 20px',
-          flexShrink: 0
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <h1 style={{ fontSize: '18px', fontWeight: '800', margin: 0, color: 'var(--primary)', letterSpacing: '0.5px' }}>
-            ADFARE DÍZIMOS
-          </h1>
-        </div>
-        <button 
-          onClick={toggleTheme} 
-          style={{ 
-            background: 'none', 
-            border: 'none', 
-            cursor: 'pointer', 
-            color: 'var(--text-main)',
-            padding: '8px',
-            borderRadius: 'var(--radius-sm)'
-          }}
-        >
-          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-        </button>
-      </header>
-
       {/* Dynamic Content */}
       <main className="app-content">
         {activeTab === 'dashboard' && (
@@ -402,6 +369,8 @@ export default function App() {
             tesoureiros={tesoureiros}
             onAddTesoureiro={handleAddTesoureiro}
             onRemoveTesoureiro={handleRemoveTesoureiro}
+            theme={theme}
+            toggleTheme={toggleTheme}
           />
         )}
         
