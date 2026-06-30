@@ -206,14 +206,14 @@ export default function Relatorio({ dizimistas, lancamentos }) {
             {tipoPeriodo === 'mes' && (
               <div className="filtro-group">
                 <label>Mês</label>
-                <select value={selectedMesIdx} onChange={e => { setSelectedMesIdx(Number(e.target.value)); setGerado(false); }}>
+                <select className="form-control" value={selectedMesIdx} onChange={e => { setSelectedMesIdx(Number(e.target.value)); setGerado(false); }}>
                   {MESES_FULL.map((m, i) => <option key={i} value={i}>{m}</option>)}
                 </select>
               </div>
             )}
             <div className="filtro-group">
               <label>Ano</label>
-              <select value={selectedAno} onChange={e => { setSelectedAno(Number(e.target.value)); setGerado(false); }}>
+              <select className="form-control" value={selectedAno} onChange={e => { setSelectedAno(Number(e.target.value)); setGerado(false); }}>
                 {anosDisponiveis.map(a => <option key={a} value={a}>{a}</option>)}
               </select>
             </div>
