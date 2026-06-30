@@ -337,7 +337,7 @@ export default function CartaoDizimo({
                         <>
                           <div className="tile-badge"><Check size={10} strokeWidth={3} /></div>
                           <div className="tile-value">
-                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(tx.valor)}
+                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)}
                           </div>
                           <div className="tile-footer" style={{ marginTop: '2px' }}>
                             Por: {tx.tesoureiro}
