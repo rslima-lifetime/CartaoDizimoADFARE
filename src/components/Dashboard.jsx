@@ -37,7 +37,11 @@ export default function Dashboard({
 
   // Recent 5 contributions
   const recentTransactions = [...lancamentos]
-    .sort((a, b) => new Date(b.dataLançamento) - new Date(a.dataLançamento))
+    .sort((a, b) => {
+      const dateA = a.dataEntrega || a.dataLançamento || '';
+      const dateB = b.dataEntrega || b.dataLançamento || '';
+      return dateB.localeCompare(dateA);
+    })
     .slice(0, 5);
 
   const getDizimistaName = (id) => {

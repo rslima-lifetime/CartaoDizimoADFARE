@@ -68,7 +68,11 @@ export default function Lancamentos({
     const matchTreasurer = !searchTreasurer.trim() || 
                            l.tesoureiro.toLowerCase().includes(searchTreasurer.toLowerCase());
     return matchDizimista && matchMonth && matchYear && matchTreasurer;
-  }).sort((a, b) => new Date(b.dataLançamento) - new Date(a.dataLançamento));
+  }).sort((a, b) => {
+    const dateA = a.dataEntrega || a.dataLançamento || '';
+    const dateB = b.dataEntrega || b.dataLançamento || '';
+    return dateA.localeCompare(dateB);
+  });
 
   // Compute total of filtered contributions
   const filteredTotal = filteredLancamentos.reduce((sum, l) => sum + l.valor, 0);

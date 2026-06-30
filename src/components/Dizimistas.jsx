@@ -130,7 +130,12 @@ export default function Dizimistas({
   const selectedHistory = selectedDizimistaId 
     ? lancamentos
         .filter(l => l.dizimistaId === selectedDizimistaId)
-        .sort((a, b) => b.ano - a.ano || new Date(b.dataLançamento) - new Date(a.dataLançamento))
+        .sort((a, b) => {
+          if (b.ano !== a.ano) return b.ano - a.ano;
+          const dateA = a.dataEntrega || a.dataLançamento || '';
+          const dateB = b.dataEntrega || b.dataLançamento || '';
+          return dateB.localeCompare(dateA);
+        })
     : [];
 
   return (
