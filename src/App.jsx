@@ -6,6 +6,16 @@ import Lancamentos from './components/Lancamentos';
 import CartaoDizimo from './components/CartaoDizimo';
 import ModalLancamento from './components/ModalLancamento';
 import Relatorio from './components/Relatorio';
+import { db } from './firebase';
+import { 
+  collection, 
+  getDocs, 
+  doc, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc, 
+  writeBatch 
+} from 'firebase/firestore';
 
 // Mock/Initial data to match user's attachment
 const INITIAL_DIZIMISTAS = [
@@ -168,6 +178,7 @@ export default function App() {
   const [dizimistas, setDizimistas] = useState([]);
   const [lancamentos, setLancamentos] = useState([]);
   const [tesoureiros, setTesoureiros] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Theme state
   const [theme, setTheme] = useState('light');
@@ -179,78 +190,118 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalInitialData, setModalInitialData] = useState(null);
 
-  // Load data from localStorage on mount
+  // Load data from Firebase on mount
   useEffect(() => {
-    const isV8Loaded = localStorage.getItem('adfare_loaded_v9');
-    
-    if (!isV8Loaded) {
-      // Force initial load of the official church records (v9 - corrects tesoureira name)
-      setDizimistas(INITIAL_DIZIMISTAS);
-      setLancamentos(INITIAL_LANCAMENTOS);
-      localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
-      localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
-      localStorage.setItem('adfare_loaded_v9', 'true');
-      // Reset tesoureiros to correct default
-      const defaultTes = ['Dcsa. Suzana'];
-      localStorage.setItem('adfare_tesoureiros', JSON.stringify(defaultTes));
-    } else {
-      const savedDizimistas = localStorage.getItem('adfare_dizimistas');
-      const savedLancamentos = localStorage.getItem('adfare_lancamentos');
-      
-      if (savedDizimistas) {
-        setDizimistas(JSON.parse(savedDizimistas));
-      } else {
-        setDizimistas(INITIAL_DIZIMISTAS);
-        localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
-      }
+    const loadFirebaseData = async () => {
+      try {
+        // 1. Fetch dizimistas
+        const dizimistasSnapshot = await getDocs(collection(db, "dizimistas"));
+        let dbDizimistas = dizimistasSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
 
-      if (savedLancamentos) {
-        setLancamentos(JSON.parse(savedLancamentos));
-      } else {
-        setLancamentos(INITIAL_LANCAMENTOS);
-        localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
-      }
-    }
+        // 2. Fetch lancamentos
+        const lancamentosSnapshot = await getDocs(collection(db, "lancamentos"));
+        let dbLancamentos = lancamentosSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
 
+        // 3. Fetch tesoureiros
+        const tesoureirosSnapshot = await getDocs(collection(db, "tesoureiros"));
+        let dbTesoureiros = tesoureirosSnapshot.docs.map(doc => doc.data().nome);
+
+        // 4. Seeding Check: If the collections are completely empty, execute automatic seeding
+        if (dbDizimistas.length === 0 && dbLancamentos.length === 0) {
+          console.log("Banco de dados Firestore vazio. Iniciando carga inicial (seeding)...");
+          
+          const batch = writeBatch(db);
+          
+          INITIAL_DIZIMISTAS.forEach(d => {
+            const dRef = doc(db, "dizimistas", d.id);
+            batch.set(dRef, {
+              nome: d.nome,
+              cargo: d.cargo,
+              status: d.status,
+              telefone: d.telefone || ''
+            });
+          });
+          
+          INITIAL_LANCAMENTOS.forEach(l => {
+            const lRef = doc(db, "lancamentos", l.id);
+            batch.set(lRef, {
+              dizimistaId: l.dizimistaId,
+              ano: l.ano,
+              mes: l.mes,
+              valor: l.valor,
+              tesoureiro: l.tesoureiro,
+              dataEntrega: l.dataEntrega
+            });
+          });
+          
+          const defaultTes = ['Dcsa. Suzana'];
+          defaultTes.forEach(t => {
+            const tRef = doc(db, "tesoureiros", t);
+            batch.set(tRef, { nome: t });
+          });
+          
+          await batch.commit();
+          console.log("Carga inicial concluída no Firebase Firestore!");
+          
+          dbDizimistas = INITIAL_DIZIMISTAS;
+          dbLancamentos = INITIAL_LANCAMENTOS;
+          dbTesoureiros = defaultTes;
+        }
+
+        // Set React state
+        setDizimistas(dbDizimistas);
+        setLancamentos(dbLancamentos);
+        setTesoureiros(dbTesoureiros.length > 0 ? dbTesoureiros : ['Dcsa. Suzana']);
+      } catch (error) {
+        console.error("Erro ao carregar dados do Firebase:", error);
+        
+        // Fallback to localStorage/Mock in case of connection failure
+        const savedDizimistas = localStorage.getItem('adfare_dizimistas');
+        const savedLancamentos = localStorage.getItem('adfare_lancamentos');
+        const savedTesoureiros = localStorage.getItem('adfare_tesoureiros');
+        
+        setDizimistas(savedDizimistas ? JSON.parse(savedDizimistas) : INITIAL_DIZIMISTAS);
+        setLancamentos(savedLancamentos ? JSON.parse(savedLancamentos) : INITIAL_LANCAMENTOS);
+        setTesoureiros(savedTesoureiros ? JSON.parse(savedTesoureiros) : ['Dcsa. Suzana']);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadFirebaseData();
+
+    // Load theme (keeps theme local to device, which is standard)
     const savedTheme = localStorage.getItem('adfare_theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
-
-    // Load tesoureiros list
-    const savedTesoureiros = localStorage.getItem('adfare_tesoureiros');
-    if (savedTesoureiros) {
-      setTesoureiros(JSON.parse(savedTesoureiros));
-    } else {
-      const defaultTesoureiros = ['Dcsa. Suzana'];
-      setTesoureiros(defaultTesoureiros);
-      localStorage.setItem('adfare_tesoureiros', JSON.stringify(defaultTesoureiros));
-    }
   }, []);
 
-  // Sync state to local storage helper
-  const saveDizimistas = (newData) => {
-    setDizimistas(newData);
-    localStorage.setItem('adfare_dizimistas', JSON.stringify(newData));
-  };
-
-  const saveLancamentos = (newData) => {
-    setLancamentos(newData);
-    localStorage.setItem('adfare_lancamentos', JSON.stringify(newData));
-  };
-
-  const saveTesoureiros = (newList) => {
-    setTesoureiros(newList);
-    localStorage.setItem('adfare_tesoureiros', JSON.stringify(newList));
-  };
-
-  const handleAddTesoureiro = (nome) => {
+  const handleAddTesoureiro = async (nome) => {
     const clean = nome.trim();
     if (!clean || tesoureiros.includes(clean)) return;
-    saveTesoureiros([...tesoureiros, clean]);
+    setTesoureiros(prev => [...prev, clean]);
+    
+    try {
+      await setDoc(doc(db, "tesoureiros", clean), { nome: clean });
+    } catch (err) {
+      console.error("Erro ao adicionar tesoureiro no Firebase:", err);
+    }
   };
 
-  const handleRemoveTesoureiro = (nome) => {
-    saveTesoureiros(tesoureiros.filter(t => t !== nome));
+  const handleRemoveTesoureiro = async (nome) => {
+    setTesoureiros(prev => prev.filter(t => t !== nome));
+    
+    try {
+      await deleteDoc(doc(db, "tesoureiros", nome));
+    } catch (err) {
+      console.error("Erro ao remover tesoureiro do Firebase:", err);
+    }
   };
 
   // Toggle Theme
@@ -262,51 +313,115 @@ export default function App() {
   };
 
   // Dizimistas CRUD
-  const handleAddDizimista = (data) => {
+  const handleAddDizimista = async (data) => {
+    const newId = Date.now().toString();
     const newDizimista = {
       ...data,
-      id: Date.now().toString()
+      id: newId
     };
-    saveDizimistas([...dizimistas, newDizimista]);
+    setDizimistas(prev => [...prev, newDizimista]);
+    
+    try {
+      await setDoc(doc(db, "dizimistas", newId), {
+        nome: data.nome,
+        cargo: data.cargo,
+        status: data.status,
+        telefone: data.telefone || ''
+      });
+    } catch (err) {
+      console.error("Erro ao salvar dizimista no Firebase:", err);
+    }
   };
 
-  const handleUpdateDizimista = (id, data) => {
-    const updated = dizimistas.map(d => d.id === id ? { ...d, ...data } : d);
-    saveDizimistas(updated);
+  const handleUpdateDizimista = async (id, data) => {
+    setDizimistas(prev => prev.map(d => d.id === id ? { ...d, ...data } : d));
+    
+    try {
+      await updateDoc(doc(db, "dizimistas", id), {
+        nome: data.nome,
+        cargo: data.cargo,
+        status: data.status,
+        telefone: data.telefone || ''
+      });
+    } catch (err) {
+      console.error("Erro ao atualizar dizimista no Firebase:", err);
+    }
   };
 
-  const handleDeleteDizimista = (id) => {
+  const handleDeleteDizimista = async (id) => {
     // Delete tither
-    const updatedDizimistas = dizimistas.filter(d => d.id !== id);
-    saveDizimistas(updatedDizimistas);
+    setDizimistas(prev => prev.filter(d => d.id !== id));
     // Delete all corresponding contributions
-    const updatedLancamentos = lancamentos.filter(l => l.dizimistaId !== id);
-    saveLancamentos(updatedLancamentos);
+    const relatedLancamentos = lancamentos.filter(l => l.dizimistaId === id);
+    setLancamentos(prev => prev.filter(l => l.dizimistaId !== id));
 
     if (selectedCardDizimistaId === id) {
       setSelectedCardDizimistaId('');
     }
-  };
-
-  // Lancamentos CRUD
-  const handleSaveLancamento = (data) => {
-    if (data.id) {
-      // Update existing item
-      const updated = lancamentos.map(l => l.id === data.id ? { ...l, ...data } : l);
-      saveLancamentos(updated);
-    } else {
-      // Add new item
-      const newEntry = {
-        ...data,
-        id: Date.now().toString()
-      };
-      saveLancamentos([...lancamentos, newEntry]);
+    
+    try {
+      await deleteDoc(doc(db, "dizimistas", id));
+      
+      const batch = writeBatch(db);
+      relatedLancamentos.forEach(l => {
+        batch.delete(doc(db, "lancamentos", l.id));
+      });
+      await batch.commit();
+    } catch (err) {
+      console.error("Erro ao deletar dizimista no Firebase:", err);
     }
   };
 
-  const handleDeleteLancamentoById = (id) => {
-    const updated = lancamentos.filter(l => l.id !== id);
-    saveLancamentos(updated);
+  // Lancamentos CRUD
+  const handleSaveLancamento = async (data) => {
+    if (data.id) {
+      // Update existing item
+      setLancamentos(prev => prev.map(l => l.id === data.id ? { ...l, ...data } : l));
+      
+      try {
+        await updateDoc(doc(db, "lancamentos", data.id), {
+          dizimistaId: data.dizimistaId,
+          ano: data.ano,
+          mes: data.mes,
+          valor: data.valor,
+          tesoureiro: data.tesoureiro,
+          dataEntrega: data.dataEntrega
+        });
+      } catch (err) {
+        console.error("Erro ao atualizar lançamento no Firebase:", err);
+      }
+    } else {
+      // Add new item
+      const newId = Date.now().toString();
+      const newEntry = {
+        ...data,
+        id: newId
+      };
+      setLancamentos(prev => [...prev, newEntry]);
+      
+      try {
+        await setDoc(doc(db, "lancamentos", newId), {
+          dizimistaId: data.dizimistaId,
+          ano: data.ano,
+          mes: data.mes,
+          valor: data.valor,
+          tesoureiro: data.tesoureiro,
+          dataEntrega: data.dataEntrega
+        });
+      } catch (err) {
+        console.error("Erro ao salvar lançamento no Firebase:", err);
+      }
+    }
+  };
+
+  const handleDeleteLancamentoById = async (id) => {
+    setLancamentos(prev => prev.filter(l => l.id !== id));
+    
+    try {
+      await deleteDoc(doc(db, "lancamentos", id));
+    } catch (err) {
+      console.error("Erro ao deletar lançamento no Firebase:", err);
+    }
   };
 
   const handleEditLancamento = (tx) => {
@@ -350,66 +465,109 @@ export default function App() {
     linkElement.click();
   };
 
-  const importData = (importedState) => {
-    saveDizimistas(importedState.dizimistas);
-    saveLancamentos(importedState.lancamentos);
+  const importData = async (importedState) => {
+    if (window.confirm("Isso irá substituir os dados atuais no Firebase pelos dados do arquivo. Deseja prosseguir?")) {
+      setIsLoading(true);
+      try {
+        const batch = writeBatch(db);
+        
+        // 1. Delete all current dizimistas and lancamentos from database
+        const oldDizimistas = await getDocs(collection(db, "dizimistas"));
+        oldDizimistas.forEach(docSnap => batch.delete(docSnap.ref));
+        
+        const oldLancamentos = await getDocs(collection(db, "lancamentos"));
+        oldLancamentos.forEach(docSnap => batch.delete(docSnap.ref));
+        
+        // 2. Upload new imported state
+        importedState.dizimistas.forEach(d => {
+          const dRef = doc(db, "dizimistas", d.id);
+          batch.set(dRef, d);
+        });
+        
+        importedState.lancamentos.forEach(l => {
+          const lRef = doc(db, "lancamentos", l.id);
+          batch.set(lRef, l);
+        });
+        
+        await batch.commit();
+        
+        // 3. Update local state
+        setDizimistas(importedState.dizimistas);
+        setLancamentos(importedState.lancamentos);
+        alert("Backup restaurado com sucesso no Firebase!");
+      } catch (err) {
+        console.error("Erro ao importar backup:", err);
+        alert("Erro ao importar backup no Firebase.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
   };
 
   return (
     <>
       {/* Dynamic Content */}
       <main className="app-content">
-        {activeTab === 'dashboard' && (
-          <Dashboard 
-            dizimistas={dizimistas}
-            lancamentos={lancamentos}
-            onOpenModal={handleOpenNewLancamento}
-            exportData={exportData}
-            importData={importData}
-            tesoureiros={tesoureiros}
-            onAddTesoureiro={handleAddTesoureiro}
-            onRemoveTesoureiro={handleRemoveTesoureiro}
-            theme={theme}
-            toggleTheme={toggleTheme}
-          />
-        )}
-        
-        {activeTab === 'dizimistas' && (
-          <Dizimistas 
-            dizimistas={dizimistas}
-            lancamentos={lancamentos}
-            onAddDizimista={handleAddDizimista}
-            onUpdateDizimista={handleUpdateDizimista}
-            onDeleteDizimista={handleDeleteDizimista}
-            onViewCard={handleViewCard}
-          />
-        )}
+        {isLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', color: 'var(--text-muted)' }}>
+            <div className="spinner" style={{ border: '3px solid var(--border)', borderTop: '3px solid var(--primary)', borderRadius: '50%', width: '30px', height: '30px', animation: 'spin 1s linear infinite', marginBottom: '16px' }} />
+            <p style={{ fontSize: '15px', fontWeight: '500' }}>Carregando dados da igreja...</p>
+          </div>
+        ) : (
+          <>
+            {activeTab === 'dashboard' && (
+              <Dashboard 
+                dizimistas={dizimistas}
+                lancamentos={lancamentos}
+                onOpenModal={handleOpenNewLancamento}
+                exportData={exportData}
+                importData={importData}
+                tesoureiros={tesoureiros}
+                onAddTesoureiro={handleAddTesoureiro}
+                onRemoveTesoureiro={handleRemoveTesoureiro}
+                theme={theme}
+                toggleTheme={toggleTheme}
+              />
+            )}
+            
+            {activeTab === 'dizimistas' && (
+              <Dizimistas 
+                dizimistas={dizimistas}
+                lancamentos={lancamentos}
+                onAddDizimista={handleAddDizimista}
+                onUpdateDizimista={handleUpdateDizimista}
+                onDeleteDizimista={handleDeleteDizimista}
+                onViewCard={handleViewCard}
+              />
+            )}
 
-        {activeTab === 'lancamentos' && (
-          <Lancamentos 
-            lancamentos={lancamentos}
-            dizimistas={dizimistas}
-            onOpenModal={handleOpenNewLancamento}
-            onDeleteLancamento={handleDeleteLancamentoById}
-            onEditLancamento={handleEditLancamento}
-          />
-        )}
+            {activeTab === 'lancamentos' && (
+              <Lancamentos 
+                lancamentos={lancamentos}
+                dizimistas={dizimistas}
+                onOpenModal={handleOpenNewLancamento}
+                onDeleteLancamento={handleDeleteLancamentoById}
+                onEditLancamento={handleEditLancamento}
+              />
+            )}
 
-        {activeTab === 'cartao' && (
-          <CartaoDizimo 
-            dizimistas={dizimistas}
-            lancamentos={lancamentos}
-            selectedDizimistaId={selectedCardDizimistaId}
-            setSelectedDizimistaId={setSelectedCardDizimistaId}
-            onCellClick={handleCellClick}
-          />
-        )}
+            {activeTab === 'cartao' && (
+              <CartaoDizimo 
+                dizimistas={dizimistas}
+                lancamentos={lancamentos}
+                selectedDizimistaId={selectedCardDizimistaId}
+                setSelectedDizimistaId={setSelectedCardDizimistaId}
+                onCellClick={handleCellClick}
+              />
+            )}
 
-        {activeTab === 'relatorio' && (
-          <Relatorio
-            dizimistas={dizimistas}
-            lancamentos={lancamentos}
-          />
+            {activeTab === 'relatorio' && (
+              <Relatorio
+                dizimistas={dizimistas}
+                lancamentos={lancamentos}
+              />
+            )}
+          </>
         )}
       </main>
 
