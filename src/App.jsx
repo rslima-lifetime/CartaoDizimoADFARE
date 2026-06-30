@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, Users, ClipboardList, CreditCard, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Users, ClipboardList, CreditCard, Sun, Moon, FileText } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Dizimistas from './components/Dizimistas';
 import Lancamentos from './components/Lancamentos';
 import CartaoDizimo from './components/CartaoDizimo';
 import ModalLancamento from './components/ModalLancamento';
+import Relatorio from './components/Relatorio';
 
 // Mock/Initial data to match user's attachment
 const INITIAL_DIZIMISTAS = [
@@ -402,6 +403,13 @@ export default function App() {
             onCellClick={handleCellClick}
           />
         )}
+
+        {activeTab === 'relatorio' && (
+          <Relatorio
+            dizimistas={dizimistas}
+            lancamentos={lancamentos}
+          />
+        )}
       </main>
 
       {/* Global Launch/Edit Modal */}
@@ -444,6 +452,13 @@ export default function App() {
         >
           <CreditCard />
           Cartões
+        </button>
+        <button 
+          className={`tab-item ${activeTab === 'relatorio' ? 'active' : ''}`}
+          onClick={() => setActiveTab('relatorio')}
+        >
+          <FileText />
+          Relatório
         </button>
       </nav>
     </>
