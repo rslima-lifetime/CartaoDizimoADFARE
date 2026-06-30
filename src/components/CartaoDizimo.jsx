@@ -144,7 +144,7 @@ export default function CartaoDizimo({
           await navigator.share({
             files: [file],
             title: `Cartão de Dízimo ${selectedYear}`,
-            text: `Resumo de dízimos de ${getDizimistaFullName()} - Ano ${selectedYear}`
+            text: `A Tesouraria, em nome do Ministério Família Restaurada, agradece a sua fidelidade e roga a Deus que supra todas as suas necessidades, em Glória, por Cristo Jesus! 🙌`
           });
         } catch (err) {
           console.log('Compartilhamento cancelado', err);
@@ -176,7 +176,7 @@ export default function CartaoDizimo({
       }
     });
 
-    text += `\n_"Cada um contribua segundo propôs no seu coração; não com tristeza, ou por necessidade; porque Deus ama ao que dá com alegria." (2 Coríntios 9:7)_`;
+    text += `\n_A Tesouraria, em nome do Ministério Família Restaurada, agradece a sua fidelidade e roga a Deus que supra todas as suas necessidades, em Glória, por Cristo Jesus! 🙌_`;
 
     const whatsappUrl = `https://api.whatsapp.com/send?phone=55${dizimista.telefone || ''}&text=${encodeURIComponent(text)}`;
     window.open(whatsappUrl, '_blank');

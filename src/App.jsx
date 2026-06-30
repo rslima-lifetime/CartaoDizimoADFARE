@@ -12,12 +12,18 @@ const INITIAL_DIZIMISTAS = [
   { id: '2', nome: 'Carlos Noan', cargo: 'Presb.', telefone: '', status: 'Ativo' },
   { id: '3', nome: 'Ednaldo Almeida', cargo: 'Dc.', telefone: '', status: 'Ativo' },
   { id: '4', nome: 'Roberto Lima', cargo: 'Dc.', telefone: '', status: 'Ativo' },
-  { id: '5', nome: 'Roberto da Silva', cargo: 'Dc.', telefone: '', status: 'Ativo' }
+  { id: '5', nome: 'Roberto da Silva', cargo: 'Dc.', telefone: '', status: 'Ativo' },
+  { id: '6', nome: 'Carlos Leandro', cargo: 'Membro', telefone: '', status: 'Ativo' },
+  { id: '7', nome: 'Leandro Santos', cargo: 'Presb.', telefone: '', status: 'Ativo' },
+  { id: '8', nome: 'Ruan dos Santos', cargo: 'Dc.', telefone: '', status: 'Ativo' },
+  { id: '9', nome: 'Sthefani Figueiredo', cargo: 'Membro', telefone: '', status: 'Ativo' }
 ];
 
 const INITIAL_LANCAMENTOS = [
-  // Ev. Carlos Santos
+  // Ev. Carlos Santos (2026)
   { id: 'l1', dizimistaId: '1', ano: 2026, mes: 'JAN', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-04' },
+  // Ev. Carlos Santos (2025)
+  { id: 'l21', dizimistaId: '1', ano: 2025, mes: 'SET', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2025-09-07' },
   
   // Presb. Carlos Noan
   { id: 'l2', dizimistaId: '2', ano: 2026, mes: 'JAN', valor: 270.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-09' },
@@ -44,7 +50,29 @@ const INITIAL_LANCAMENTOS = [
   { id: 'l19', dizimistaId: '4', ano: 2026, mes: 'JAN', valor: 60.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-09' },
 
   // Dc. Roberto da Silva
-  { id: 'l20', dizimistaId: '5', ano: 2026, mes: 'JAN', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-04' }
+  { id: 'l20', dizimistaId: '5', ano: 2026, mes: 'JAN', valor: 200.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-04' },
+
+  // Ir. Carlos Leandro
+  { id: 'l22', dizimistaId: '6', ano: 2026, mes: 'MAR', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-06' },
+  { id: 'l23', dizimistaId: '6', ano: 2026, mes: 'ABR', valor: 140.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-07' },
+
+  // Presb. Leandro Santos
+  { id: 'l24', dizimistaId: '7', ano: 2026, mes: 'FEV', valor: 425.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-01' },
+  { id: 'l25', dizimistaId: '7', ano: 2026, mes: 'FEV', valor: 425.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-11' },
+  { id: 'l26', dizimistaId: '7', ano: 2026, mes: 'MAR', valor: 100.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-01' },
+  { id: 'l27', dizimistaId: '7', ano: 2026, mes: 'MAI', valor: 400.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-29' },
+
+  // Dc. Ruan dos Santos
+  { id: 'l28', dizimistaId: '8', ano: 2026, mes: 'JAN', valor: 145.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-05' },
+  { id: 'l29', dizimistaId: '8', ano: 2026, mes: 'FEV', valor: 145.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-05' },
+
+  // Sthefani Figueiredo
+  { id: 'l30', dizimistaId: '9', ano: 2026, mes: 'JAN', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-01-05' },
+  { id: 'l31', dizimistaId: '9', ano: 2026, mes: 'FEV', valor: 250.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-02-11' },
+  { id: 'l32', dizimistaId: '9', ano: 2026, mes: 'MAR', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-03-10' },
+  { id: 'l33', dizimistaId: '9', ano: 2026, mes: 'ABR', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-04' },
+  { id: 'l34', dizimistaId: '9', ano: 2026, mes: 'MAI', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-08' },
+  { id: 'l35', dizimistaId: '9', ano: 2026, mes: 'JUN', valor: 160.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-06' }
 ];
 
 export default function App() {
@@ -64,15 +92,15 @@ export default function App() {
 
   // Load data from localStorage on mount
   useEffect(() => {
-    const isV4Loaded = localStorage.getItem('adfare_loaded_v4');
+    const isV5Loaded = localStorage.getItem('adfare_loaded_v5');
     
-    if (!isV4Loaded) {
-      // Force initial load of the official church records from user's screenshots (with multi-payment support)
+    if (!isV5Loaded) {
+      // Force initial load of the official church records from user's screenshots (with multi-payment support - v5 database)
       setDizimistas(INITIAL_DIZIMISTAS);
       setLancamentos(INITIAL_LANCAMENTOS);
       localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
       localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
-      localStorage.setItem('adfare_loaded_v4', 'true');
+      localStorage.setItem('adfare_loaded_v5', 'true');
     } else {
       const savedDizimistas = localStorage.getItem('adfare_dizimistas');
       const savedLancamentos = localStorage.getItem('adfare_lancamentos');
