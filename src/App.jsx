@@ -26,7 +26,9 @@ const INITIAL_DIZIMISTAS = [
   { id: '16', nome: 'Alexia da Silva', cargo: 'Dcsa.', telefone: '', status: 'Ativo' },
   { id: '17', nome: 'Isabelly Felix', cargo: 'Membro', telefone: '', status: 'Ativo' },
   { id: '18', nome: 'Joice dos Santos', cargo: 'Membro', telefone: '', status: 'Ativo' },
-  { id: '19', nome: 'Rosane Oliveira', cargo: 'Membro', telefone: '', status: 'Ativo' }
+  { id: '19', nome: 'Rosane Oliveira', cargo: 'Membro', telefone: '', status: 'Ativo' },
+  { id: '20', nome: 'Miriam Menezes', cargo: 'Membro', telefone: '', status: 'Ativo' },
+  { id: '21', nome: 'Syndel Queiroz', cargo: 'Membro', telefone: '', status: 'Ativo' }
 ];
 
 const INITIAL_LANCAMENTOS = [
@@ -151,7 +153,13 @@ const INITIAL_LANCAMENTOS = [
   // Rosane Oliveira
   { id: 'l82', dizimistaId: '19', ano: 2026, mes: 'ABR', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-04-05' },
   { id: 'l83', dizimistaId: '19', ano: 2026, mes: 'MAI', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-05-08' },
-  { id: 'l84', dizimistaId: '19', ano: 2026, mes: 'JUN', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-01' }
+  { id: 'l84', dizimistaId: '19', ano: 2026, mes: 'JUN', valor: 130.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-01' },
+
+  // Miriam Menezes
+  { id: 'l85', dizimistaId: '20', ano: 2026, mes: 'JUN', valor: 434.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-06' },
+
+  // Syndel Queiroz
+  { id: 'l86', dizimistaId: '21', ano: 2026, mes: 'JUN', valor: 150.00, tesoureiro: 'Dcsa. Suzana Lima', dataEntrega: '2026-06-29' }
 ];
 
 export default function App() {
@@ -171,15 +179,15 @@ export default function App() {
 
   // Load data from localStorage on mount
   useEffect(() => {
-    const isV7Loaded = localStorage.getItem('adfare_loaded_v7');
+    const isV8Loaded = localStorage.getItem('adfare_loaded_v8');
     
-    if (!isV7Loaded) {
-      // Force initial load of the official church records from user's screenshots (with multi-payment support - v7 database)
+    if (!isV8Loaded) {
+      // Force initial load of the official church records from user's screenshots (with multi-payment support - v8 database)
       setDizimistas(INITIAL_DIZIMISTAS);
       setLancamentos(INITIAL_LANCAMENTOS);
       localStorage.setItem('adfare_dizimistas', JSON.stringify(INITIAL_DIZIMISTAS));
       localStorage.setItem('adfare_lancamentos', JSON.stringify(INITIAL_LANCAMENTOS));
-      localStorage.setItem('adfare_loaded_v7', 'true');
+      localStorage.setItem('adfare_loaded_v8', 'true');
     } else {
       const savedDizimistas = localStorage.getItem('adfare_dizimistas');
       const savedLancamentos = localStorage.getItem('adfare_lancamentos');
