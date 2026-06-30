@@ -167,6 +167,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [dizimistas, setDizimistas] = useState([]);
   const [lancamentos, setLancamentos] = useState([]);
+  const [tesoureiros, setTesoureiros] = useState([]);
   
   // Theme state
   const [theme, setTheme] = useState('light');
@@ -211,6 +212,16 @@ export default function App() {
     const savedTheme = localStorage.getItem('adfare_theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // Load tesoureiros list
+    const savedTesoureiros = localStorage.getItem('adfare_tesoureiros');
+    if (savedTesoureiros) {
+      setTesoureiros(JSON.parse(savedTesoureiros));
+    } else {
+      const defaultTesoureiros = ['Dcsa. Suzana Lima'];
+      setTesoureiros(defaultTesoureiros);
+      localStorage.setItem('adfare_tesoureiros', JSON.stringify(defaultTesoureiros));
+    }
   }, []);
 
   // Sync state to local storage helper
@@ -222,6 +233,21 @@ export default function App() {
   const saveLancamentos = (newData) => {
     setLancamentos(newData);
     localStorage.setItem('adfare_lancamentos', JSON.stringify(newData));
+  };
+
+  const saveTesoureiros = (newList) => {
+    setTesoureiros(newList);
+    localStorage.setItem('adfare_tesoureiros', JSON.stringify(newList));
+  };
+
+  const handleAddTesoureiro = (nome) => {
+    const clean = nome.trim();
+    if (!clean || tesoureiros.includes(clean)) return;
+    saveTesoureiros([...tesoureiros, clean]);
+  };
+
+  const handleRemoveTesoureiro = (nome) => {
+    saveTesoureiros(tesoureiros.filter(t => t !== nome));
   };
 
   // Toggle Theme
@@ -370,6 +396,9 @@ export default function App() {
             onOpenModal={handleOpenNewLancamento}
             exportData={exportData}
             importData={importData}
+            tesoureiros={tesoureiros}
+            onAddTesoureiro={handleAddTesoureiro}
+            onRemoveTesoureiro={handleRemoveTesoureiro}
           />
         )}
         
@@ -421,6 +450,7 @@ export default function App() {
         dizimistas={dizimistas}
         lancamentos={lancamentos}
         initialData={modalInitialData}
+        tesoureiros={tesoureiros}
       />
 
       {/* Bottom Navigation Tabbar */}

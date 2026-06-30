@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { DollarSign, Users, Calendar, Plus, Download, Upload, ShieldAlert } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { DollarSign, Users, Calendar, Plus, Download, Upload, ShieldAlert, UserCog, Trash2 } from 'lucide-react';
 import LogoADFARE from './LogoADFARE';
 
 export default function Dashboard({ 
@@ -7,9 +7,13 @@ export default function Dashboard({
   lancamentos, 
   onOpenModal, 
   exportData, 
-  importData 
+  importData,
+  tesoureiros = [],
+  onAddTesoureiro,
+  onRemoveTesoureiro
 }) {
   const fileInputRef = useRef(null);
+  const [novoTesoureiro, setNovoTesoureiro] = useState('');
 
   // Compute metrics
   const activeDizimistasCount = dizimistas.filter(d => d.status === 'Ativo').length;
@@ -151,6 +155,66 @@ export default function Dashboard({
             ))}
           </div>
         )}
+      </div>
+
+      {/* Tesoureiros */}
+      <div className="card" style={{ textAlign: 'left' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-title)', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <UserCog size={18} color="var(--primary)" /> Tesoureiros
+        </h3>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '14px' }}>
+          Os nomes cadastrados aqui aparecem como opção ao registrar um dízimo.
+        </p>
+
+        {/* Lista */}
+        {tesoureiros.length === 0 ? (
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>Nenhum tesoureiro cadastrado.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
+            {tesoureiros.map((t) => (
+              <div key={t} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: 'var(--bg-input)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)' }}>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-title)' }}>{t}</span>
+                <button
+                  type="button"
+                  onClick={() => onRemoveTesoureiro(t)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--danger)', padding: '4px', display: 'flex', alignItems: 'center' }}
+                  title="Remover tesoureiro"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Adicionar */}
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Ex: Dcsa. Suzana Lima"
+            value={novoTesoureiro}
+            onChange={(e) => setNovoTesoureiro(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onAddTesoureiro(novoTesoureiro);
+                setNovoTesoureiro('');
+              }
+            }}
+          />
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ whiteSpace: 'nowrap', padding: '0 16px', height: '44px', fontSize: '13px' }}
+            onClick={() => {
+              onAddTesoureiro(novoTesoureiro);
+              setNovoTesoureiro('');
+            }}
+          >
+            <Plus size={16} /> Adicionar
+          </button>
+        </div>
       </div>
 
       {/* System Settings & Backup */}

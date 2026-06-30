@@ -7,8 +7,9 @@ export default function ModalLancamento({
   onSave, 
   onDelete,
   dizimistas, 
-  initialData = null, // { dizimistaId, ano, mes }
-  lancamentos = []
+  initialData = null,
+  lancamentos = [],
+  tesoureiros = []
 }) {
   const [dizimistaId, setDizimistaId] = useState('');
   const [ano, setAno] = useState(new Date().getFullYear());
@@ -18,6 +19,7 @@ export default function ModalLancamento({
   const [dataEntrega, setDataEntrega] = useState('');
   const [valorText, setValorText] = useState('');
   const [tesoureiro, setTesoureiro] = useState('');
+  const [tesoureiroCustom, setTesoureiroCustom] = useState(false);
 
   // Edit mode tracking state
   const [editingId, setEditingId] = useState(null);
@@ -90,9 +92,19 @@ export default function ModalLancamento({
       setDataEntrega(getLocalDateString());
       setValorText('');
 
-      // Auto-fill treasurer with last used in the ledger
+      // Auto-fill treasurer with first in list or last used
       const lastTx = [...lancamentos].sort((a, b) => b.id - a.id)[0];
-      setTesoureiro(lastTx ? lastTx.tesoureiro : '');
+      const defaultTes = lastTx?.tesoureiro || (tesoureiros.length > 0 ? tesoureiros[0] : '');
+      if (tesoureiros.includes(defaultTes)) {
+        setTesoureiro(defaultTes);
+        setTesoureiroCustom(false);
+      } else if (defaultTes) {
+        setTesoureiro(defaultTes);
+        setTesoureiroCustom(true);
+      } else {
+        setTesoureiro('');
+        setTesoureiroCustom(false);
+      }
     }
   }, [isOpen, initialData, lancamentos]);
 
@@ -318,17 +330,52 @@ export default function ModalLancamento({
                 />
               </div>
 
-              {/* Treasurer Input */}
+              {/* Treasurer Dropdown */}
               <div className="form-group">
                 <label className="form-label" style={{ fontSize: '11px' }}>Tesoureiro(a)</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Nome do tesoureiro..."
-                  value={tesoureiro}
-                  onChange={(e) => setTesoureiro(e.target.value)}
-                  required
-                />
+                {!tesoureiroCustom ? (
+                  <select
+                    className="form-control"
+                    value={tesoureiro}
+                    onChange={(e) => {
+                      if (e.target.value === '__outro__') {
+                        setTesoureiroCustom(true);
+                        setTesoureiro('');
+                      } else {
+                        setTesoureiro(e.target.value);
+                      }
+                    }}
+                    required
+                  >
+                    <option value="">Selecione...</option>
+                    {tesoureiros.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                    <option value="__outro__">➕ Outro (digitar)</option>
+                  </select>
+                ) : (
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Nome do tesoureiro..."
+                      value={tesoureiro}
+                      onChange={(e) => setTesoureiro(e.target.value)}
+                      required
+                      autoFocus
+                    />
+                    {tesoureiros.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => { setTesoureiroCustom(false); setTesoureiro(tesoureiros[0]); }}
+                        style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '0 8px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '12px', whiteSpace: 'nowrap' }}
+                        title="Voltar à lista"
+                      >
+                        ← Lista
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
