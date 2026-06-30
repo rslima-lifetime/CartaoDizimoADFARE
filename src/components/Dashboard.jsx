@@ -1,0 +1,188 @@
+import React, { useRef } from 'react';
+import { DollarSign, Users, Calendar, Plus, Download, Upload, ShieldAlert } from 'lucide-react';
+import LogoADFARE from './LogoADFARE';
+
+export default function Dashboard({ 
+  dizimistas, 
+  lancamentos, 
+  onOpenModal, 
+  exportData, 
+  importData 
+}) {
+  const fileInputRef = useRef(null);
+
+  // Compute metrics
+  const activeDizimistasCount = dizimistas.filter(d => d.status === 'Ativo').length;
+  
+  const currentMonthNum = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+  const mesesAbrev = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ', '13º'];
+  const currentMonthAbrev = mesesAbrev[currentMonthNum];
+
+  // Total collected this month
+  const totalMonth = lancamentos
+    .filter(l => l.ano === currentYear && l.mes === currentMonthAbrev)
+    .reduce((sum, l) => sum + l.valor, 0);
+
+  // Total collected this year
+  const totalYear = lancamentos
+    .filter(l => l.ano === currentYear)
+    .reduce((sum, l) => sum + l.valor, 0);
+
+  // Recent 5 contributions
+  const recentTransactions = [...lancamentos]
+    .sort((a, b) => new Date(b.dataLançamento) - new Date(a.dataLançamento))
+    .slice(0, 5);
+
+  const getDizimistaName = (id) => {
+    const d = dizimistas.find(x => x.id === id);
+    if (!d) return 'Dizimista Removido';
+    return d.cargo ? `${d.cargo} ${d.nome}` : d.nome;
+  };
+
+  const handleImportChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target.result);
+        if (parsed.dizimistas && parsed.lancamentos) {
+          importData(parsed);
+          alert('Dados importados com sucesso!');
+        } else {
+          alert('Arquivo inválido. Certifique-se de que é um backup do app ADFARE.');
+        }
+      } catch (err) {
+        alert('Erro ao ler o arquivo de backup. Formato JSON inválido.');
+      }
+    };
+    reader.readAsText(file);
+    // Reset file input value
+    e.target.value = null;
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+        <div style={{ width: '60px', height: '60px' }}>
+          <LogoADFARE />
+        </div>
+        <div style={{ textAlign: 'left' }}>
+          <h2 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-title)', lineHeight: '1.2' }}>
+            AD Família Restaurada
+          </h2>
+          <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+            Painel Administrativo de Dízimos
+          </span>
+        </div>
+      </div>
+
+      {/* Metrics Widgets */}
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="stat-label">Este Mês ({currentMonthAbrev})</span>
+            <DollarSign size={18} color="var(--success)" />
+          </div>
+          <div className="stat-value">
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalMonth)}
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="stat-label">Total do Ano ({currentYear})</span>
+            <DollarSign size={18} color="var(--primary)" />
+          </div>
+          <div className="stat-value">
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalYear)}
+          </div>
+        </div>
+
+        <div className="stat-card" style={{ gridColumn: 'span 2' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="stat-label">Dizimistas Ativos Cadastrados</span>
+            <Users size={18} color="var(--secondary)" />
+          </div>
+          <div className="stat-value" style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+            {activeDizimistasCount}
+            <span style={{ fontSize: '13px', fontWeight: 'normal', color: 'var(--text-muted)' }}>
+              de {dizimistas.length} no total
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Launch Button */}
+      <button 
+        className="btn btn-primary" 
+        onClick={() => onOpenModal()}
+        style={{ marginBottom: '24px', height: '52px' }}
+      >
+        <Plus size={20} /> Lancar Novo Dízimo
+      </button>
+
+      {/* Recent Activity List */}
+      <div className="card">
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-title)', marginBottom: '16px', textAlign: 'left' }}>
+          Lançamentos Recentes
+        </h3>
+        
+        {recentTransactions.length === 0 ? (
+          <div style={{ padding: '20px 0', color: 'var(--text-muted)', fontSize: '14px', textAlign: 'center' }}>
+            Nenhum lançamento registrado ainda.
+          </div>
+        ) : (
+          <div className="history-list">
+            {recentTransactions.map((tx, idx) => (
+              <div className="history-item" key={idx}>
+                <div className="history-item-left">
+                  <div className="history-item-month">{getDizimistaName(tx.dizimistaId)}</div>
+                  <div className="history-item-sub">
+                    {tx.mes}/{tx.ano} • Por: {tx.tesoureiro}
+                  </div>
+                </div>
+                <div className="history-item-right">
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* System Settings & Backup */}
+      <div className="card" style={{ textAlign: 'left' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-title)', marginBottom: '12px' }}>
+          Backup de Dados
+        </h3>
+        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+          Como os dados são salvos localmente neste aparelho, exporte backups regularmente para evitar perdas ou transferir os dados para outro celular.
+        </p>
+        
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="btn btn-secondary" style={{ flex: 1, fontSize: '13px', padding: '10px' }} onClick={exportData}>
+            <Download size={16} /> Exportar Backup
+          </button>
+          
+          <button 
+            className="btn btn-secondary" 
+            style={{ flex: 1, fontSize: '13px', padding: '10px' }} 
+            onClick={() => fileInputRef.current.click()}
+          >
+            <Upload size={16} /> Importar Backup
+          </button>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            style={{ display: 'none' }} 
+            accept=".json"
+            onChange={handleImportChange}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
