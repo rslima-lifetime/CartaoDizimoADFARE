@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Download, Copy, Share2, Send, Calendar, User } from 'lucide-react';
+import { Download, Copy, Share2, Send, Calendar, User, Grid, Table, Check } from 'lucide-react';
 import LogoADFARE from './LogoADFARE';
 import html2canvas from 'html2canvas';
 
@@ -11,23 +11,24 @@ export default function CartaoDizimo({
   onCellClick 
 }) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [layoutMode, setLayoutMode] = useState('mosaic'); // default: 'mosaic' for modern grid view!
   const cardRef = useRef(null);
   const [isExporting, setIsExporting] = useState(false);
 
   const meses = [
-    { key: 'JAN', name: 'JAN' },
-    { key: 'FEV', name: 'FEV' },
-    { key: 'MAR', name: 'MAR' },
-    { key: 'ABR', name: 'ABR' },
-    { key: 'MAI', name: 'MAI' },
-    { key: 'JUN', name: 'JUN' },
-    { key: 'JUL', name: 'JUL' },
-    { key: 'AGO', name: 'AGO' },
-    { key: 'SET', name: 'SET' },
-    { key: 'OUT', name: 'OUT' },
-    { key: 'NOV', name: 'NOV' },
-    { key: 'DEZ', name: 'DEZ' },
-    { key: '13º', name: '13º' }
+    { key: 'JAN', name: 'Janeiro' },
+    { key: 'FEV', name: 'Fevereiro' },
+    { key: 'MAR', name: 'Março' },
+    { key: 'ABR', name: 'Abril' },
+    { key: 'MAI', name: 'Maio' },
+    { key: 'JUN', name: 'Junho' },
+    { key: 'JUL', name: 'Julho' },
+    { key: 'AGO', name: 'Agosto' },
+    { key: 'SET', name: 'Setembro' },
+    { key: 'OUT', name: 'Outubro' },
+    { key: 'NOV', name: 'Novembro' },
+    { key: 'DEZ', name: 'Dezembro' },
+    { key: '13º', name: '13º Salário' }
   ];
 
   const anosDisponiveis = Array.from(
@@ -65,10 +66,9 @@ export default function CartaoDizimo({
   const generateCanvas = async () => {
     if (!cardRef.current) return null;
     setIsExporting(true);
-    // Briefly force standard styling adjustments for high quality export if needed
     try {
       const canvas = await html2canvas(cardRef.current, {
-        scale: 3, // High DPI scaling for crisp details on mobile screen
+        scale: 3, // High resolution scaling for crisp fonts and borders
         useCORS: true,
         backgroundColor: '#ffffff',
         logging: false
@@ -90,7 +90,7 @@ export default function CartaoDizimo({
     const dataUrl = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     const cleanName = dizimista.nome.toLowerCase().replace(/\s+/g, '_');
-    link.download = `cartao_dizimo_${cleanName}_${selectedYear}.png`;
+    link.download = `cartao_dizimo_${cleanName}_${selectedYear}_${layoutMode}.png`;
     link.href = dataUrl;
     link.click();
   };
@@ -106,12 +106,12 @@ export default function CartaoDizimo({
           await navigator.clipboard.write([
             new ClipboardItem({ 'image/png': blob })
           ]);
-          showToast('Cartão copiado! Agora cole diretamente no WhatsApp.');
+          showToast('Cartão copiado! Cole diretamente no WhatsApp.');
         } else {
-          showToast('Cópia não suportada. Experimente "Baixar Imagem".');
+          showToast('Cópia automática não suportada. Baixe a imagem e envie.');
         }
       } catch (err) {
-        showToast('Falha ao copiar. Baixe a imagem e envie.');
+        showToast('Falha ao copiar. Baixe a imagem.');
       }
     }, 'image/png');
   };
@@ -130,7 +130,7 @@ export default function CartaoDizimo({
           await navigator.share({
             files: [file],
             title: `Cartão de Dízimo ${selectedYear}`,
-            text: `Segue o cartão de dízimo de ${getDizimistaFullName()} - Ano ${selectedYear}`
+            text: `Resumo de dízimos de ${getDizimistaFullName()} - Ano ${selectedYear}`
           });
         } catch (err) {
           console.log('Compartilhamento cancelado', err);
@@ -142,7 +142,7 @@ export default function CartaoDizimo({
     }, 'image/png');
   };
 
-  // Action: Send Text Only (Reliable fallback and quick notification method)
+  // Action: Send Text Only (Fallback method)
   const handleSendTextOnly = () => {
     if (!dizimista) return;
 
@@ -156,9 +156,9 @@ export default function CartaoDizimo({
       const tx = getContributionForMonth(m.key);
       if (tx) {
         const val = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor);
-        text += `• *${m.name}:* ${val} (${formatDateAbbrev(tx.dataLançamento)}) - Tesoureiro: ${tx.tesoureiro}\n`;
+        text += `• *${m.key}:* ${val} (${formatDateAbbrev(tx.dataLançamento)}) - Por: ${tx.tesoureiro}\n`;
       } else {
-        text += `• *${m.name}:* [Em aberto]\n`;
+        text += `• *${m.key}:* [Em aberto]\n`;
       }
     });
 
@@ -179,11 +179,11 @@ export default function CartaoDizimo({
     <div>
       {toastMessage && <div className="toast">{toastMessage}</div>}
 
-      {/* Selectors card */}
+      {/* Selectors panel */}
       <div className="card" style={{ padding: '14px', marginBottom: '16px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '10px' }}>
           
-          {/* Dizimista selector */}
+          {/* Tither selector */}
           <div className="form-group" style={{ margin: 0 }}>
             <label className="form-label" style={{ fontSize: '11px' }}><User size={10} /> Dizimista</label>
             <select 
@@ -215,16 +215,33 @@ export default function CartaoDizimo({
               ))}
             </select>
           </div>
-
         </div>
       </div>
+
+      {/* Layout toggle selector */}
+      {selectedDizimistaId && (
+        <div className="layout-selector">
+          <button 
+            className={`layout-btn ${layoutMode === 'mosaic' ? 'active' : ''}`}
+            onClick={() => setLayoutMode('mosaic')}
+          >
+            <Grid size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> Mosaico Premium
+          </button>
+          <button 
+            className={`layout-btn ${layoutMode === 'table' ? 'active' : ''}`}
+            onClick={() => setLayoutMode('table')}
+          >
+            <Table size={14} style={{ marginRight: '6px', verticalAlign: 'middle' }} /> Tabela Moderna
+          </button>
+        </div>
+      )}
 
       {/* Empty State */}
       {!selectedDizimistaId && (
         <div className="empty-state card">
           <User size={40} />
           <div className="empty-state-title">Nenhum Dizimista Selecionado</div>
-          <p style={{ fontSize: '13px' }}>Selecione um dizimista acima para visualizar e gerar o cartão digital.</p>
+          <p style={{ fontSize: '13px' }}>Selecione um dizimista acima para gerar o cartão de controle.</p>
         </div>
       )}
 
@@ -237,8 +254,8 @@ export default function CartaoDizimo({
               ref={cardRef} 
               className="tithing-card-container"
               style={{ 
-                boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', 
-                maxWidth: '400px', 
+                boxShadow: '0 10px 25px rgba(0,0,0,0.08)', 
+                maxWidth: '420px', 
                 margin: '0 auto',
                 position: 'relative'
               }}
@@ -254,7 +271,7 @@ export default function CartaoDizimo({
                   </div>
                   <div className="tithing-card-meta-grid">
                     <div className="tithing-card-meta-item">
-                      NOME: <span>{getDizimistaFullName()}</span>
+                      NOME: <span style={{ textTransform: 'uppercase' }}>{getDizimistaFullName()}</span>
                     </div>
                     <div className="tithing-card-meta-item" style={{ textAlign: 'right' }}>
                       ANO: <span>{selectedYear}</span>
@@ -263,49 +280,91 @@ export default function CartaoDizimo({
                 </div>
               </div>
 
-              {/* Table */}
-              <table className="tithing-card-table">
-                <thead>
-                  <tr>
-                    <th>DATA</th>
-                    <th>MÊS</th>
-                    <th>DÍZIMO</th>
-                    <th>TESOUREIRO</th>
-                  </tr>
-                </thead>
-                <tbody>
+              {/* Conditional Layouts */}
+              {layoutMode === 'table' ? (
+                /* Layout 1: Modernized Table */
+                <table className="modern-table">
+                  <thead>
+                    <tr>
+                      <th>DATA</th>
+                      <th>MÊS</th>
+                      <th>DÍZIMO</th>
+                      <th>TESOUREIRO</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {meses.map((m) => {
+                      const tx = getContributionForMonth(m.key);
+                      if (tx) {
+                        return (
+                          <tr 
+                            key={m.key} 
+                            onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
+                          >
+                            <td className="col-date">{formatDateAbbrev(tx.dataLançamento)}</td>
+                            <td className="col-month">{m.key}</td>
+                            <td className="col-value">
+                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)}
+                            </td>
+                            <td className="col-treasurer">{tx.tesoureiro}</td>
+                          </tr>
+                        );
+                      } else {
+                        return (
+                          <tr 
+                            key={m.key} 
+                            className="empty-row"
+                            onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
+                          >
+                            <td className="col-date"></td>
+                            <td className="col-month">{m.key}</td>
+                            <td className="col-value"></td>
+                            <td className="col-treasurer"></td>
+                          </tr>
+                        );
+                      }
+                    })}
+                  </tbody>
+                </table>
+              ) : (
+                /* Layout 2: Modern Mosaic Grid */
+                <div className="mosaic-grid">
                   {meses.map((m) => {
                     const tx = getContributionForMonth(m.key);
-                    if (tx) {
-                      return (
-                        <tr 
-                          key={m.key} 
-                          onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <td>{formatDateAbbrev(tx.dataLançamento)}</td>
-                          <td>{m.name}</td>
-                          <td>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(tx.valor)}</td>
-                          <td>{tx.tesoureiro}</td>
-                        </tr>
-                      );
-                    } else {
-                      return (
-                        <tr 
-                          key={m.key} 
-                          className="empty-row"
-                          onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
-                        >
-                          <td></td>
-                          <td>{m.name}</td>
-                          <td></td>
-                          <td></td>
-                        </tr>
-                      );
-                    }
+                    const isPaid = !!tx;
+                    const is13 = m.key === '13º';
+                    
+                    return (
+                      <div 
+                        key={m.key}
+                        className={`mosaic-tile ${isPaid ? 'paid' : 'unpaid'} ${is13 ? 'tile-13' : ''}`}
+                        onClick={() => onCellClick({ dizimistaId: selectedDizimistaId, ano: selectedYear, mes: m.key })}
+                      >
+                        <div className="tile-month-name">{m.key}</div>
+                        
+                        {isPaid ? (
+                          <>
+                            <div className="tile-badge"><Check size={10} strokeWidth={3} /></div>
+                            <div className="tile-value">
+                              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(tx.valor)}
+                            </div>
+                            <div className="tile-footer">
+                              {formatDateAbbrev(tx.dataLançamento)} • {tx.tesoureiro.split(' ').slice(-1)[0]}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div style={{ color: '#cbd5e1', fontSize: '16px', fontWeight: 'light', margin: '4px 0' }}>-</div>
+                            <div className="tile-footer" style={{ fontStyle: 'italic', color: '#94a3b8' }}>
+                              Em aberto
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
                   })}
-                </tbody>
-              </table>
+                </div>
+              )}
 
               {/* Card Footer Quote */}
               <div className="tithing-card-footer">
@@ -314,14 +373,13 @@ export default function CartaoDizimo({
             </div>
           </div>
 
-          {/* Export Action Buttons */}
+          {/* Export Actions Panel */}
           <div className="card">
             <h4 style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--text-title)', marginBottom: '12px', textAlign: 'left' }}>
-              Compartilhar Cartão
+              Compartilhar Cartão Digital
             </h4>
             
             <div className="share-actions-grid">
-              
               <button 
                 className="btn btn-secondary" 
                 onClick={handleCopyToClipboard} 
@@ -356,7 +414,6 @@ export default function CartaoDizimo({
               >
                 <Send size={16} /> Enviar Resumo por Texto no WhatsApp
               </button>
-
             </div>
           </div>
         </>
